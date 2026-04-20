@@ -1,56 +1,966 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EknathaLabs | Blog</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EknathaLabs Blog — DevOps · Linux · Kubernetes · Platform Engineering</title>
+  <meta name="description" content="Real-world DevOps war stories, Linux challenges, Kubernetes debugging, and a Platform Engineer's journey in progress.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+
   <style>
-    body { margin:0; font-family:'Inter',sans-serif; background:#020617; color:#e2e8f0; }
-    header { text-align:center; padding:30px; border-bottom:1px solid #1e293b; }
-    h1 { color:#38bdf8; margin:0; }
-    nav a { margin:0 10px; color:#38bdf8; text-decoration:none; }
-    .container { max-width:900px; margin:auto; padding:20px; }
-    .badge { text-align:center; margin:20px 0; }
-    .badge span { background:#1e293b; padding:8px 14px; border-radius:20px; color:#facc15; }
-    .post { border:1px solid #1e293b; padding:20px; border-radius:10px; margin-bottom:20px; }
-    footer { text-align:center; padding:20px; border-top:1px solid #1e293b; color:#64748b; }
+    /* ─── TOKENS ─────────────────────────────────────── */
+    :root {
+      --bg:         #080b0f;
+      --bg2:        #0d1117;
+      --surface:    #111820;
+      --border:     #1c2333;
+      --border-hi:  #2a3a52;
+      --text:       #dce4f0;
+      --muted:      #6a7a96;
+      --dim:        #3d4f6a;
+      --green:      #00e5a0;
+      --green-dim:  rgba(0,229,160,0.08);
+      --green-glow: rgba(0,229,160,0.18);
+      --amber:      #f5a623;
+      --red:        #f05454;
+      --blue:       #4a9eff;
+      --serif:      'Playfair Display', Georgia, serif;
+      --mono:       'IBM Plex Mono', 'Courier New', monospace;
+      --sans:       'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.65;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* subtle scanlines overlay */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── SCROLLBAR ───────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+    /* ─── ANIMATIONS ──────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0; }
+    }
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--green-glow); }
+      50%       { box-shadow: 0 0 0 6px transparent; }
+    }
+    @keyframes scan {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(400%); }
+    }
+
+    .fade-up { animation: fadeUp 0.6s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+
+    /* ─── NAV ─────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(8,11,15,0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 28px; height: 56px;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: 13px; font-weight: 600;
+      color: var(--text); letter-spacing: 0.02em;
+    }
+    .nav-brand .logo-mark {
+      width: 28px; height: 28px;
+      border: 1.5px solid var(--green);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--green);
+      box-shadow: 0 0 10px var(--green-glow);
+      animation: glow-pulse 3s ease-in-out infinite;
+    }
+    .nav-brand .slash { color: var(--dim); margin: 0 2px; }
+    .nav-brand .section { color: var(--muted); }
+
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--muted); padding: 6px 12px;
+      border-radius: 5px; transition: all 0.18s;
+      letter-spacing: 0.04em;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--surface); }
+    .nav-links .nav-cta {
+      color: var(--green); border: 1px solid rgba(0,229,160,0.25);
+      margin-left: 8px;
+    }
+    .nav-links .nav-cta:hover { background: var(--green-dim); color: var(--green); }
+
+    /* ─── HEADER / HERO ───────────────────────────────── */
+    .site-header {
+      max-width: 1200px; margin: 0 auto;
+      padding: 60px 28px 0;
+    }
+    .header-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 40px;
+    }
+    .header-left { flex: 1; }
+
+    .eyebrow {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--green); letter-spacing: 0.18em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .eyebrow::before {
+      content: ''; width: 32px; height: 1px;
+      background: var(--green);
+    }
+    .eyebrow .cursor {
+      display: inline-block; width: 7px; height: 13px;
+      background: var(--green);
+      animation: blink 1.1s step-end infinite;
+      vertical-align: middle;
+    }
+
+    .site-title {
+      font-family: var(--serif);
+      font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .site-title em {
+      font-style: italic; color: var(--green);
+    }
+    .site-title .line2 {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .site-desc {
+      margin-top: 20px;
+      font-size: 15px; color: var(--muted);
+      max-width: 460px; line-height: 1.75;
+      font-weight: 300;
+    }
+
+    .header-stats {
+      display: flex; flex-direction: column; gap: 0;
+      padding: 24px; background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; min-width: 200px;
+    }
+    .stat-row {
+      display: flex; flex-direction: column;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .stat-row:first-child { padding-top: 0; }
+    .stat-num {
+      font-family: var(--mono); font-size: 22px;
+      font-weight: 600; color: var(--text);
+      line-height: 1;
+    }
+    .stat-num span { color: var(--green); }
+    .stat-label {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-top: 4px;
+    }
+
+    /* ─── FILTER BAR ──────────────────────────────────── */
+    .filter-bar {
+      max-width: 1200px; margin: 48px auto 0;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0;
+      overflow-x: auto;
+    }
+    .filter-bar::-webkit-scrollbar { height: 0; }
+    .filter-btn {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--muted); padding: 14px 18px;
+      border: none; background: none; cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.18s; letter-spacing: 0.06em;
+      text-transform: uppercase;
+      position: relative; bottom: -1px;
+    }
+    .filter-btn:hover { color: var(--text); }
+    .filter-btn.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+    .filter-count {
+      display: inline-block;
+      font-size: 10px; color: var(--dim);
+      margin-left: 5px;
+    }
+
+    /* ─── MAIN LAYOUT ─────────────────────────────────── */
+    .main-layout {
+      max-width: 1200px; margin: 0 auto;
+      padding: 48px 28px 80px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 48px;
+    }
+
+    /* ─── FEATURED POST ───────────────────────────────── */
+    .featured-post {
+      grid-column: 1 / -1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .featured-post:hover { border-color: var(--border-hi); }
+
+    .featured-visual {
+      background: var(--bg2);
+      position: relative; overflow: hidden;
+      min-height: 340px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .terminal-window {
+      width: 88%; background: #0a0f14;
+      border: 1px solid var(--border-hi);
+      border-radius: 10px; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+    .terminal-bar {
+      background: #151d26; padding: 10px 14px;
+      display: flex; align-items: center; gap: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .t-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .t-dot.r { background: #f05454; }
+    .t-dot.y { background: #f5a623; }
+    .t-dot.g { background: #00e5a0; }
+    .t-title {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--dim); margin-left: 8px;
+    }
+    .terminal-body { padding: 18px 16px; font-family: var(--mono); font-size: 12px; line-height: 1.8; }
+    .t-prompt { color: var(--green); }
+    .t-cmd    { color: var(--text); }
+    .t-out    { color: var(--muted); padding-left: 0; }
+    .t-err    { color: var(--red); }
+    .t-hi     { color: var(--amber); }
+    .t-ok     { color: var(--green); }
+    .t-cursor {
+      display: inline-block; width: 7px; height: 13px;
+      background: var(--green);
+      animation: blink 1.1s step-end infinite;
+      vertical-align: middle;
+    }
+
+    /* scan line on featured */
+    .featured-visual::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, rgba(0,229,160,0.04), transparent);
+      animation: scan 4s linear infinite;
+      pointer-events: none;
+    }
+
+    .featured-content {
+      padding: 40px 40px 40px 44px;
+      display: flex; flex-direction: column;
+      justify-content: center;
+    }
+    .post-series {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 4px;
+      display: inline-flex; width: fit-content;
+      margin-bottom: 20px;
+    }
+    .series-linux { color: var(--green); background: var(--green-dim); border: 1px solid rgba(0,229,160,0.15); }
+    .series-k8s   { color: var(--blue);  background: rgba(74,158,255,0.08); border: 1px solid rgba(74,158,255,0.15); }
+    .series-pe    { color: var(--amber); background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.15); }
+    .series-tips  { color: #c084fc;      background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.15); }
+
+    .featured-content h2 {
+      font-family: var(--serif);
+      font-size: 1.85rem; font-weight: 700;
+      line-height: 1.2; color: var(--text);
+      margin-bottom: 14px;
+    }
+    .featured-content h2 em { font-style: italic; color: var(--green); }
+    .featured-content p {
+      font-size: 14px; color: var(--muted);
+      line-height: 1.75; font-weight: 300;
+      margin-bottom: 28px;
+    }
+
+    .post-meta {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--mono); font-size: 11px; color: var(--dim);
+    }
+    .meta-sep { color: var(--border-hi); }
+    .read-time { color: var(--muted); }
+
+    .btn-read {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 24px; padding: 11px 22px;
+      background: var(--green); color: #000;
+      font-family: var(--mono); font-size: 12px; font-weight: 600;
+      border-radius: 6px; letter-spacing: 0.04em;
+      width: fit-content; transition: all 0.18s;
+    }
+    .btn-read:hover {
+      background: #00ffb3;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,229,160,0.35);
+    }
+    .btn-read .arrow { font-size: 14px; transition: transform 0.18s; }
+    .btn-read:hover .arrow { transform: translateX(3px); }
+
+    /* ─── POSTS GRID ──────────────────────────────────── */
+    .posts-col { display: flex; flex-direction: column; gap: 0; }
+    .posts-section-label {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--dim); letter-spacing: 0.14em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .posts-grid { display: flex; flex-direction: column; gap: 1px; }
+
+    .post-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      transition: all 0.2s;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .post-card:hover {
+      border-color: var(--border-hi);
+      background: #131c28;
+      transform: translateX(3px);
+    }
+    .post-card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+    .card-body { display: flex; flex-direction: column; gap: 8px; }
+    .card-series { margin-bottom: 4px; }
+    .card-title {
+      font-family: var(--serif); font-size: 1.05rem;
+      font-weight: 700; color: var(--text);
+      line-height: 1.3;
+    }
+    .card-excerpt {
+      font-size: 13px; color: var(--muted);
+      font-weight: 300; line-height: 1.65;
+    }
+    .card-footer {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 12px;
+    }
+    .card-footer .post-meta { font-size: 10px; }
+
+    .card-arrow {
+      font-size: 18px; color: var(--green);
+      opacity: 0; transform: translateX(-6px);
+      transition: all 0.2s;
+      padding-top: 2px;
+    }
+
+    /* ─── SIDEBAR ─────────────────────────────────────── */
+    .sidebar { display: flex; flex-direction: column; gap: 28px; }
+
+    .sidebar-widget {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .widget-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.14em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .widget-header .w-icon { color: var(--green); }
+    .widget-body { padding: 20px; }
+
+    /* series list */
+    .series-list { display: flex; flex-direction: column; gap: 10px; }
+    .series-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      transition: all 0.18s; cursor: pointer;
+    }
+    .series-item:hover { border-color: var(--border-hi); background: var(--surface); }
+    .series-item-left { display: flex; align-items: center; gap: 10px; }
+    .series-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .series-name {
+      font-size: 13px; font-weight: 500; color: var(--text);
+    }
+    .series-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .series-badge {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--dim); background: var(--bg);
+      padding: 2px 8px; border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* about widget */
+    .about-widget { display: flex; flex-direction: column; gap: 14px; }
+    .about-avatar {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--green) 0%, #00a0ff 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 18px; font-weight: 600;
+      color: #000;
+    }
+    .about-name {
+      font-family: var(--serif); font-size: 1.1rem;
+      font-weight: 700; color: var(--text);
+    }
+    .about-bio {
+      font-size: 12.5px; color: var(--muted);
+      line-height: 1.7; font-weight: 300;
+    }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .about-tag {
+      font-family: var(--mono); font-size: 10px;
+      padding: 3px 9px; border-radius: 4px;
+      border: 1px solid var(--border-hi);
+      color: var(--muted);
+    }
+    .about-links { display: flex; gap: 8px; margin-top: 4px; }
+    .about-link {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--muted); padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px; background: var(--bg2);
+      transition: all 0.18s;
+    }
+    .about-link:hover { color: var(--green); border-color: rgba(0,229,160,0.3); }
+
+    /* newsletter */
+    .newsletter-form { display: flex; flex-direction: column; gap: 10px; }
+    .nl-desc { font-size: 12.5px; color: var(--muted); font-weight: 300; line-height: 1.65; }
+    .nl-input {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 7px; color: var(--text);
+      font-family: var(--mono); font-size: 12px;
+      outline: none; transition: border-color 0.18s;
+    }
+    .nl-input::placeholder { color: var(--dim); }
+    .nl-input:focus { border-color: rgba(0,229,160,0.4); }
+    .nl-btn {
+      padding: 10px 14px;
+      background: var(--green); color: #000;
+      font-family: var(--mono); font-size: 12px; font-weight: 600;
+      border: none; border-radius: 7px; cursor: pointer;
+      transition: all 0.18s; letter-spacing: 0.04em;
+    }
+    .nl-btn:hover { background: #00ffb3; }
+
+    /* ─── LOAD MORE ───────────────────────────────────── */
+    .load-more-wrap {
+      display: flex; justify-content: center;
+      margin-top: 8px;
+    }
+    .btn-load {
+      font-family: var(--mono); font-size: 12px;
+      color: var(--muted); padding: 11px 28px;
+      border: 1px solid var(--border);
+      border-radius: 7px; background: var(--surface);
+      cursor: pointer; transition: all 0.18s;
+      letter-spacing: 0.06em;
+    }
+    .btn-load:hover {
+      color: var(--green); border-color: rgba(0,229,160,0.3);
+      background: var(--green-dim);
+    }
+
+    /* ─── FOOTER ──────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 40px 28px;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 20px;
+    }
+    .footer-brand {
+      font-family: var(--mono); font-size: 12px;
+      color: var(--muted);
+    }
+    .footer-brand strong { color: var(--text); }
+    .footer-tagline {
+      font-size: 11px; color: var(--dim);
+      margin-top: 4px; font-family: var(--mono);
+    }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--dim); transition: color 0.18s;
+      letter-spacing: 0.06em;
+    }
+    .footer-links a:hover { color: var(--green); }
+
+    /* ─── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 900px) {
+      .featured-post { grid-template-columns: 1fr; }
+      .featured-visual { min-height: 240px; }
+      .main-layout { grid-template-columns: 1fr; }
+      .sidebar { grid-row: auto; }
+      .header-top { flex-direction: column; }
+      .header-stats { flex-direction: row; gap: 0; }
+      .stat-row { flex: 1; border-bottom: none; border-right: 1px solid var(--border); padding: 0 20px; }
+      .stat-row:last-child { border-right: none; }
+    }
+    @media (max-width: 600px) {
+      .nav-links .hide-mobile { display: none; }
+      .site-title { font-size: 2.2rem; }
+      .featured-content { padding: 28px; }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>✍️ EknathaLabs Blog</h1>
-  <p>DevOps • Linux • Kubernetes • Real-World Fixes</p>
-  <nav>
-    <a href="https://eknathalabs.com">Home</a>
-    <a href="https://labs.eknathalabs.com">Labs</a>
-    <a href="https://learn.eknathalabs.com">Learn</a>
-    <a href="https://github.com/eknatha">GitHub</a>
+  <!-- AMBIENT BLOBS -->
+  <div style="position:fixed;pointer-events:none;z-index:0;inset:0;overflow:hidden;">
+    <div style="position:absolute;width:700px;height:700px;top:-200px;left:-150px;
+      background:radial-gradient(circle,rgba(0,229,160,0.05) 0%,transparent 70%);
+      border-radius:50%;"></div>
+    <div style="position:absolute;width:500px;height:500px;bottom:-100px;right:-100px;
+      background:radial-gradient(circle,rgba(74,158,255,0.05) 0%,transparent 70%);
+      border-radius:50%;"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">
+        <div class="logo-mark">E</div>
+        <span>EknathaLabs<span class="slash">/</span><span class="section">blog</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="https://eknathalabs.com" class="hide-mobile">Home</a>
+        <a href="https://labs.eknathalabs.com" class="hide-mobile">Labs</a>
+        <a href="https://learn.eknathalabs.com" class="hide-mobile">Learn</a>
+        <a href="https://github.com/eknatha" class="hide-mobile">GitHub</a>
+        <a href="#newsletter" class="nav-cta">Subscribe</a>
+      </div>
+    </div>
   </nav>
-</header>
 
-<div class="container">
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="header-top">
+      <div class="header-left">
+        <div class="eyebrow fade-up">
+          blog.eknathalabs.com <span class="cursor"></span>
+        </div>
+        <h1 class="site-title fade-up delay-1">
+          Real DevOps.
+          <em>Real Fixes.</em>
+          <span class="line2">No Fluff.</span>
+        </h1>
+        <p class="site-desc fade-up delay-2">
+          Linux war stories, Kubernetes debugging deep-dives, and a Platform Engineer's
+          transition — documented in public. Written from production experience, not documentation.
+        </p>
+      </div>
+      <div class="header-stats fade-up delay-3">
+        <div class="stat-row">
+          <div class="stat-num">12<span>+</span></div>
+          <div class="stat-label">Articles</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-num">4</div>
+          <div class="stat-label">Series</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-num">13<span>yr</span></div>
+          <div class="stat-label">Experience</div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <div class="badge">
-    <span>🚧 Blog is under construction — exciting content coming soon!</span>
+  <!-- FILTER BAR -->
+  <div class="filter-bar fade-up delay-4">
+    <button class="filter-btn active" onclick="filterPosts('all', this)">All Posts <span class="filter-count">12</span></button>
+    <button class="filter-btn" onclick="filterPosts('linux', this)">Linux 100 <span class="filter-count">5</span></button>
+    <button class="filter-btn" onclick="filterPosts('k8s', this)">Kubernetes <span class="filter-count">4</span></button>
+    <button class="filter-btn" onclick="filterPosts('pe', this)">Platform Eng <span class="filter-count">2</span></button>
+    <button class="filter-btn" onclick="filterPosts('tips', this)">Quick Tips <span class="filter-count">1</span></button>
   </div>
 
-  <div class="post">
-    <h2>Linux 100 Challenges</h2>
-    <p>Hands-on commands and real DevOps scenarios.</p>
-  </div>
+  <!-- MAIN -->
+  <main class="main-layout">
 
-  <div class="post">
-    <h2>Kubernetes Production Issues</h2>
-    <p>Debugging real-world cluster failures.</p>
-  </div>
+    <!-- FEATURED -->
+    <article class="featured-post fade-up">
+      <div class="featured-visual">
+        <div class="terminal-window">
+          <div class="terminal-bar">
+            <span class="t-dot r"></span>
+            <span class="t-dot y"></span>
+            <span class="t-dot g"></span>
+            <span class="t-title">eknatha@prod-node-01 ~ bash</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="t-prompt">$ </span><span class="t-cmd">kubectl get pods -n payment-svc</span></div>
+            <div class="t-out">NAME                     READY   STATUS</div>
+            <div><span class="t-err">payment-api-6d4f9b  0/1     CrashLoopBackOff</span></div>
+            <div class="t-out" style="margin-top:6px">Restarting... (7 times in 3m)</div>
+            <br>
+            <div><span class="t-prompt">$ </span><span class="t-cmd">kubectl logs payment-api-6d4f9b --previous</span></div>
+            <div class="t-out">FATAL: Cannot connect to postgres</div>
+            <div class="t-err">dial tcp: connection refused</div>
+            <br>
+            <div><span class="t-prompt">$ </span><span class="t-cmd">kubectl describe svc postgres-svc</span></div>
+            <div class="t-out">Endpoints: <span class="t-hi">&lt;none&gt;</span>  ← found it</div>
+            <br>
+            <div><span class="t-prompt">$ </span><span class="t-cmd">kubectl get ep postgres-svc</span></div>
+            <div class="t-out">Selector mismatch detected</div>
+            <div class="t-ok">✓ Fixed: label app=postgres-db → postgres</div>
+            <div style="margin-top:8px"><span class="t-prompt">$ </span><span class="t-cursor"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="featured-content">
+        <span class="post-series series-k8s">☸ Kubernetes War Stories</span>
+        <h2>CrashLoopBackOff at 3 AM — <em>How I Traced It in 8 Minutes</em></h2>
+        <p>
+          A payment service was restarting every 90 seconds. No alerts fired on the actual
+          root cause. Here's the exact kubectl sequence that exposed a silent selector
+          mismatch — and why this pattern will happen again.
+        </p>
+        <div class="post-meta">
+          <span>Apr 18, 2026</span>
+          <span class="meta-sep">·</span>
+          <span class="read-time">7 min read</span>
+          <span class="meta-sep">·</span>
+          <span>#kubernetes #debugging #production</span>
+        </div>
+        <a href="#" class="btn-read">Read Post <span class="arrow">→</span></a>
+      </div>
+    </article>
 
-</div>
+    <!-- POSTS COLUMN -->
+    <div class="posts-col">
+      <div class="posts-section-label">// latest_posts</div>
+      <div class="posts-grid" id="posts-grid">
 
-<footer>
-  <p>© 2026 EknathaLabs | Built with ❤️  for DevOps • SRE • Platform Engineering </p>
-</footer>
+        <article class="post-card" data-series="linux">
+          <div class="card-body">
+            <span class="post-series series-linux card-series">◈ Linux 100</span>
+            <div class="card-title">Find All Files Modified in Last 24 Hours Across a Fleet</div>
+            <div class="card-excerpt">Challenge #12 — Using find with -mtime, -newer, and how to pipe results to a remote collector without spawning 40 subshells.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Apr 15, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">5 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+        <article class="post-card" data-series="pe">
+          <div class="card-body">
+            <span class="post-series series-pe card-series">⬡ Platform Eng in Progress</span>
+            <div class="card-title">Why I'm Moving from L3 Support to Platform Engineering</div>
+            <div class="card-excerpt">13 years in ops and I still felt like I was plugging holes. This is the honest story of why I decided to build platforms instead of firefight them.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Apr 10, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">8 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+        <article class="post-card" data-series="k8s">
+          <div class="card-body">
+            <span class="post-series series-k8s card-series">☸ Kubernetes War Stories</span>
+            <div class="card-title">Pod Stuck in Terminating — 4 Root Causes and How to Force It</div>
+            <div class="card-excerpt">Finalizers, PVCs, network policies, and webhook timeouts. The four reasons a pod won't die and the safe way to handle each one.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Apr 5, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">6 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+        <article class="post-card" data-series="linux">
+          <div class="card-body">
+            <span class="post-series series-linux card-series">◈ Linux 100</span>
+            <div class="card-title">Parse a 100K-Line Log File Without Loading It Into Memory</div>
+            <div class="card-excerpt">Challenge #08 — awk, sed, and grep patterns that run in constant memory. When you can't afford to cat a 2GB log on a live node.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Mar 30, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">4 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+        <article class="post-card" data-series="tips">
+          <div class="card-body">
+            <span class="post-series series-tips card-series">◎ Quick Tips</span>
+            <div class="card-title">rsync vs scp — Which One and When</div>
+            <div class="card-excerpt">A 300-word breakdown. rsync wins on resumable transfers and delta sync. scp wins on one-liners where you trust the network.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Mar 25, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">3 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+        <article class="post-card" data-series="pe">
+          <div class="card-body">
+            <span class="post-series series-pe card-series">⬡ Platform Eng in Progress</span>
+            <div class="card-title">CKA Prep After 7 Years of Cloud Ops — What Surprised Me</div>
+            <div class="card-excerpt">The exam isn't hard if you know Kubernetes. Except I thought I knew Kubernetes. Week 1 notes from someone with real cluster experience who still got humbled.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Mar 20, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">9 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+      </div>
+
+      <div class="load-more-wrap">
+        <button class="btn-load">load_more_posts() →</button>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- ABOUT -->
+      <div class="sidebar-widget">
+        <div class="widget-header"><span class="w-icon">▸</span> whoami</div>
+        <div class="widget-body">
+          <div class="about-widget">
+            <div class="about-avatar">E</div>
+            <div>
+              <div class="about-name">Eknatha</div>
+            </div>
+            <p class="about-bio">
+              Building in public. Writing what I actually learn, not what the docs say.
+            </p>
+            <div class="about-tags">
+              <span class="about-tag">Linux</span>
+              <span class="about-tag">Kubernetes</span>
+              <span class="about-tag">AWS</span>
+              <span class="about-tag">Terraform</span>
+              <span class="about-tag">CKA+CKS</span>
+            </div>
+            <div class="about-links">
+              <a href="https://github.com/eknatha" class="about-link">GitHub</a>
+              <a href="https://eknathalabs.com" class="about-link">Labs</a>
+              <a href="https://eknatha.github.io/interview-prep" class="about-link">Prep</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERIES -->
+      <div class="sidebar-widget">
+        <div class="widget-header"><span class="w-icon">▸</span> series</div>
+        <div class="widget-body">
+          <div class="series-list">
+            <div class="series-item" onclick="filterPosts('linux', null)">
+              <div class="series-item-left">
+                <span class="series-dot" style="background:var(--green)"></span>
+                <div>
+                  <div class="series-name">Linux 100 Challenges</div>
+                  <div class="series-desc">Hands-on command scenarios</div>
+                </div>
+              </div>
+              <span class="series-badge">5</span>
+            </div>
+            <div class="series-item" onclick="filterPosts('k8s', null)">
+              <div class="series-item-left">
+                <span class="series-dot" style="background:var(--blue)"></span>
+                <div>
+                  <div class="series-name">Kubernetes War Stories</div>
+                  <div class="series-desc">Real cluster debugging</div>
+                </div>
+              </div>
+              <span class="series-badge">4</span>
+            </div>
+            <div class="series-item" onclick="filterPosts('pe', null)">
+              <div class="series-item-left">
+                <span class="series-dot" style="background:var(--amber)"></span>
+                <div>
+                  <div class="series-name">Platform Eng in Progress</div>
+                  <div class="series-desc">The honest transition journal</div>
+                </div>
+              </div>
+              <span class="series-badge">2</span>
+            </div>
+            <div class="series-item" onclick="filterPosts('tips', null)">
+              <div class="series-item-left">
+                <span class="series-dot" style="background:#c084fc"></span>
+                <div>
+                  <div class="series-name">Quick Tips</div>
+                  <div class="series-desc">300-word focused fixes</div>
+                </div>
+              </div>
+              <span class="series-badge">1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEWSLETTER -->
+      <div class="sidebar-widget" id="newsletter">
+        <div class="widget-header"><span class="w-icon">▸</span> subscribe</div>
+        <div class="widget-body">
+          <div class="newsletter-form">
+            <p class="nl-desc">New post every week. No marketing. Just Linux, Kubernetes, and whatever I broke this week.</p>
+            <input class="nl-input" type="email" placeholder="your@email.com" />
+            <button class="nl-btn">subscribe →</button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand"><strong>EknathaLabs</strong> / Blog</div>
+        <div class="footer-tagline">DevOps · Linux · Kubernetes · Platform Engineering · Built in public</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://eknathalabs.com">eknathalabs.com</a>
+        <a href="https://github.com/eknatha">GitHub</a>
+        <a href="https://eknatha.github.io/interview-prep">Interview Prep</a>
+        <a href="https://eknatha.github.io/linux-command-explainer">CLI Explainer</a>
+        <a href="#">RSS</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Filter posts
+    function filterPosts(series, btn) {
+      // Update active button
+      if (btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      const cards = document.querySelectorAll('.post-card');
+      cards.forEach(card => {
+        if (series === 'all' || card.dataset.series === series) {
+          card.style.display = 'grid';
+          card.style.animation = 'fadeUp 0.35s ease both';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Scroll-triggered fade-up for cards
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.post-card').forEach((card, i) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = `opacity 0.4s ease ${i * 0.07}s, transform 0.4s ease ${i * 0.07}s`;
+      observer.observe(card);
+    });
+  </script>
 
 </body>
 </html>
