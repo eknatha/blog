@@ -324,10 +324,12 @@
       display: inline-flex; width: fit-content;
       margin-bottom: 20px;
     }
-    .series-linux { color: var(--green); background: var(--green-dim); border: 1px solid rgba(0,229,160,0.15); }
-    .series-k8s   { color: var(--blue);  background: rgba(74,158,255,0.08); border: 1px solid rgba(74,158,255,0.15); }
-    .series-pe    { color: var(--amber); background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.15); }
-    .series-tips  { color: #c084fc;      background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.15); }
+    .series-linux    { color: var(--green); background: var(--green-dim); border: 1px solid rgba(0,229,160,0.15); }
+    .series-k8s      { color: var(--blue);  background: rgba(74,158,255,0.08); border: 1px solid rgba(74,158,255,0.15); }
+    .series-pe       { color: var(--amber); background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.15); }
+    .series-tips     { color: #c084fc;      background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.15); }
+    .series-dotfiles { color: #fb7185;      background: rgba(251,113,133,0.08); border: 1px solid rgba(251,113,133,0.18); }
+    .series-tif      { color: #34d399;      background: rgba(52,211,153,0.08);  border: 1px solid rgba(52,211,153,0.15); }
 
     .featured-content h2 {
       font-family: var(--serif);
@@ -628,11 +630,11 @@
       </div>
       <div class="header-stats fade-up delay-3">
         <div class="stat-row">
-          <div class="stat-num">12<span>+</span></div>
+          <div class="stat-num">15<span>+</span></div>
           <div class="stat-label">Articles</div>
         </div>
         <div class="stat-row">
-          <div class="stat-num">4</div>
+          <div class="stat-num">6</div>
           <div class="stat-label">Series</div>
         </div>
         <div class="stat-row">
@@ -645,10 +647,12 @@
 
   <!-- FILTER BAR -->
   <div class="filter-bar fade-up delay-4">
-    <button class="filter-btn active" onclick="filterPosts('all', this)">All Posts <span class="filter-count">12</span></button>
+    <button class="filter-btn active" onclick="filterPosts('all', this)">All Posts <span class="filter-count">15</span></button>
     <button class="filter-btn" onclick="filterPosts('linux', this)">Linux 100 <span class="filter-count">5</span></button>
     <button class="filter-btn" onclick="filterPosts('k8s', this)">Kubernetes <span class="filter-count">4</span></button>
     <button class="filter-btn" onclick="filterPosts('pe', this)">Platform Eng <span class="filter-count">2</span></button>
+    <button class="filter-btn" onclick="filterPosts('dotfiles', this)">Dotfiles <span class="filter-count">2</span></button>
+    <button class="filter-btn" onclick="filterPosts('tif', this)">Today I Fixed <span class="filter-count">1</span></button>
     <button class="filter-btn" onclick="filterPosts('tips', this)">Quick Tips <span class="filter-count">1</span></button>
   </div>
 
@@ -792,7 +796,7 @@
         <article class="post-card" data-series="pe">
           <div class="card-body">
             <span class="post-series series-pe card-series">⬡ Platform Eng in Progress</span>
-            <div class="card-title">CKA Prep After 7 Years of Cloud Ops — What Surprised Me</div>
+            <div class="card-title">CKA Prep After 7+ Years of Cloud Ops — What Surprised Me</div>
             <div class="card-excerpt">The exam isn't hard if you know Kubernetes. Except I thought I knew Kubernetes. Week 1 notes from someone with real cluster experience who still got humbled.</div>
             <div class="card-footer">
               <div class="post-meta">
@@ -806,6 +810,60 @@
         </article>
 
       </div>
+
+        <article class="post-card" data-series="dotfiles">
+          <div class="card-body">
+            <span class="post-series series-dotfiles card-series">⚙ My Dotfiles Explained</span>
+            <div class="card-title">My .bashrc, .vimrc & Aliases — Every Line Explained</div>
+            <div class="card-excerpt">13+ years of ops muscle memory, written down at last. My full dotfiles with annotations: prompt tuning, kubectl shortcuts, SSH multiplexing, and the aliases I reach for every single day.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Apr 19, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">11 min</span>
+                <span class="meta-sep">·</span>
+                <span>#dotfiles #bash #linux #productivity</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+        <article class="post-card" data-series="dotfiles">
+          <div class="card-body">
+            <span class="post-series series-dotfiles card-series">⚙ My Dotfiles Explained</span>
+            <div class="card-title">My tmux Config — Split Panes, Session Persistence & DevOps Shortcuts</div>
+            <div class="card-excerpt">How I structure tmux for live incident response: named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that saved me when SSH dropped mid-deploy.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Apr 14, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">7 min</span>
+                <span class="meta-sep">·</span>
+                <span>#tmux #dotfiles #terminal</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
+
+        <article class="post-card" data-series="tif">
+          <div class="card-body">
+            <span class="post-series series-tif card-series">⚡ Today I Fixed</span>
+            <div class="card-title">TIF #01 — df Shows 100% But du Disagrees</div>
+            <div class="card-excerpt">Deleted log files held open by a running process. df counted the space as used, du didn't see it. lsof found the culprit in 30 seconds. Here's the exact command.</div>
+            <div class="card-footer">
+              <div class="post-meta">
+                <span>Apr 21, 2026</span>
+                <span class="meta-sep">·</span>
+                <span class="read-time">2 min</span>
+                <span class="meta-sep">·</span>
+                <span>#linux #storage #lsof</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </article>
 
       <div class="load-more-wrap">
         <button class="btn-load">load_more_posts() →</button>
@@ -884,6 +942,26 @@
                 <div>
                   <div class="series-name">Quick Tips</div>
                   <div class="series-desc">300-word focused fixes</div>
+                </div>
+              </div>
+              <span class="series-badge">1</span>
+            </div>
+            <div class="series-item" onclick="filterPosts('dotfiles', null)">
+              <div class="series-item-left">
+                <span class="series-dot" style="background:#fb7185"></span>
+                <div>
+                  <div class="series-name">My Dotfiles Explained</div>
+                  <div class="series-desc">.bashrc · .vimrc · tmux · aliases</div>
+                </div>
+              </div>
+              <span class="series-badge">2</span>
+            </div>
+            <div class="series-item" onclick="filterPosts('tif', null)">
+              <div class="series-item-left">
+                <span class="series-dot" style="background:#34d399"></span>
+                <div>
+                  <div class="series-name">Today I Fixed</div>
+                  <div class="series-desc">Micro-posts · one fix · 2 min read</div>
                 </div>
               </div>
               <span class="series-badge">1</span>
