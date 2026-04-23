@@ -461,6 +461,205 @@
     }
     #toast.show { transform:translateY(0); opacity:1; }
 
+    /* ═══ PREREQUISITES ══════════════════════════════════
+       Collapsible section shown on each post card.
+       data-prereqs="bash,SSH" on the <article> enables it.
+    ════════════════════════════════════════════════════ */
+    .prereq-block {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+    .prereq-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; cursor: pointer;
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.08em;
+      text-transform: uppercase; user-select: none;
+      transition: color var(--t);
+    }
+    .prereq-toggle:hover { color: var(--text); }
+    .prereq-toggle .ptlabel { display: flex; align-items: center; gap: 7px; }
+    .prereq-toggle .ptlabel::before {
+      content: '⚑'; font-size: 11px; color: var(--amber);
+    }
+    .prereq-chevron {
+      font-size: 10px; transition: transform 0.2s ease;
+      color: var(--dim);
+    }
+    .prereq-block.open .prereq-chevron { transform: rotate(180deg); }
+    .prereq-body {
+      display: none; padding: 10px 12px 12px;
+      border-top: 1px solid var(--border);
+    }
+    .prereq-block.open .prereq-body { display: block; }
+    .prereq-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .prereq-pill {
+      font-family: var(--mono); font-size: 10px;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(245,166,35,0.08);
+      border: 1px solid rgba(245,166,35,0.2);
+      color: var(--amber);
+    }
+    .prereq-note {
+      font-size: 11px; color: var(--dim); margin-top: 8px;
+      font-style: italic; line-height: 1.5;
+    }
+
+    /* ═══ READING PROGRESS RING ══════════════════════════
+       Circular SVG ring on each card showing % read.
+       Filled from localStorage when post is marked read.
+    ════════════════════════════════════════════════════ */
+    .card-right-col {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+    }
+    .read-ring-wrap {
+      position: relative; width: 38px; height: 38px;
+      flex-shrink: 0; cursor: pointer;
+    }
+    .read-ring-wrap title { display: none; }
+    .read-ring-bg  { fill: none; stroke: var(--border); stroke-width: 3; }
+    .read-ring-fg  {
+      fill: none; stroke: var(--green); stroke-width: 3;
+      stroke-linecap: round;
+      transform: rotate(-90deg); transform-origin: 50% 50%;
+      transition: stroke-dashoffset 0.6s ease;
+    }
+    .read-ring-fg.complete { stroke: var(--green); }
+    .read-ring-label {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 8px; color: var(--muted);
+      line-height: 1;
+    }
+    .read-ring-wrap.done .read-ring-label { color: var(--green); font-size: 12px; }
+    .read-ring-wrap:hover .read-ring-label { color: var(--text); }
+
+    /* ═══ SERIES PROGRESS TRACKER ════════════════════════
+       Floating panel (bottom-left) for ordered series.
+       Tracks which posts you've marked read via localStorage.
+    ════════════════════════════════════════════════════ */
+    #series-tracker {
+      position: fixed; bottom: 28px; left: 28px; z-index: 300;
+      width: 260px;
+      background: var(--surface); border: 1px solid var(--border-hi);
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      transform: translateY(120%); opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+    #series-tracker.visible { transform: translateY(0); opacity: 1; pointer-events: all; }
+    .tracker-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .tracker-title {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .tracker-title .t-dot-live {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+    .tracker-close {
+      font-size: 14px; color: var(--dim); cursor: pointer;
+      line-height: 1; transition: color var(--t);
+    }
+    .tracker-close:hover { color: var(--red); }
+
+    .tracker-series-tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tracker-series-tabs::-webkit-scrollbar { height: 0; }
+    .tracker-tab {
+      font-family: var(--mono); font-size: 10px; color: var(--muted);
+      padding: 8px 14px; cursor: pointer; white-space: nowrap;
+      border-bottom: 2px solid transparent; transition: all var(--t);
+      background: none; border-top: none; border-left: none; border-right: none;
+    }
+    .tracker-tab:hover { color: var(--text); }
+    .tracker-tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+    .tracker-body { padding: 14px 16px; }
+    .tracker-progress-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .tracker-fraction {
+      font-family: var(--mono); font-size: 20px; font-weight: 600;
+      color: var(--text); line-height: 1;
+    }
+    .tracker-fraction span { color: var(--green); }
+    .tracker-pct {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+    }
+    .tracker-bar-wrap {
+      height: 4px; background: var(--border);
+      border-radius: 2px; overflow: hidden; margin-bottom: 12px;
+    }
+    .tracker-bar-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--green), #00a0ff);
+      transition: width 0.5s ease;
+    }
+    .tracker-posts { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; }
+    .tracker-posts::-webkit-scrollbar { width: 3px; }
+    .tracker-posts::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+    .tracker-post-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 8px; border-radius: 6px; cursor: pointer;
+      transition: background var(--t);
+    }
+    .tracker-post-row:hover { background: var(--surface2); }
+    .tracker-check {
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1.5px solid var(--border-hi); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; transition: all var(--t);
+    }
+    .tracker-post-row.done .tracker-check {
+      background: var(--green); border-color: var(--green); color: #000;
+    }
+    .tracker-post-title {
+      font-size: 11px; color: var(--muted); line-height: 1.3;
+      transition: color var(--t);
+    }
+    .tracker-post-row:hover .tracker-post-title,
+    .tracker-post-row.done .tracker-post-title { color: var(--text); }
+    .tracker-cta {
+      margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+      font-family: var(--mono); font-size: 10px; color: var(--dim); text-align: center;
+    }
+    .tracker-cta span { color: var(--green); cursor: pointer; }
+    .tracker-cta span:hover { text-decoration: underline; }
+
+    /* Tracker toggle button (bottom-left corner) */
+    #tracker-btn {
+      position: fixed; bottom: 28px; left: 28px; z-index: 301;
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 16px;
+      background: var(--surface); border: 1px solid var(--border-hi);
+      border-radius: 20px; cursor: pointer;
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      transition: all var(--t);
+    }
+    #tracker-btn:hover { color: var(--green); border-color: rgba(0,229,160,0.3); }
+    #tracker-btn .tb-icon { font-size: 13px; }
+    #tracker-btn .tb-count {
+      background: var(--green); color: #000;
+      font-size: 9px; font-weight: 600;
+      padding: 1px 6px; border-radius: 10px;
+    }
+
     /* ═══ RESPONSIVE ════════════════════════════════════ */
     @media(max-width:900px) {
       .featured-post { grid-template-columns:1fr; }
@@ -647,7 +846,9 @@
         data-series="tif"
         data-tags="linux df du lsof storage disk"
         data-date="2026-04-21"
-        data-title="TIF #01 — df Shows 100% But du Disagrees">
+        data-title="TIF #01 — df Shows 100% But du Disagrees"
+        data-prereqs="Basic Linux CLI,df/du commands,Root or sudo access"
+        data-order="1">
         <div class="card-body">
           <span class="post-series series-tif card-series">⚡ Today I Fixed</span>
           <div class="card-title">TIF #01 — df Shows 100% But du Disagrees</div>
@@ -660,8 +861,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#linux</span><span class="tag">#storage</span><span class="tag">#lsof</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: Dotfiles — .bashrc -->
@@ -669,7 +883,9 @@
         data-series="dotfiles"
         data-tags="dotfiles bashrc vimrc aliases bash linux productivity"
         data-date="2026-04-19"
-        data-title="My .bashrc, .vimrc & Aliases — Every Line Explained">
+        data-title="My .bashrc, .vimrc & Aliases — Every Line Explained"
+        data-prereqs="Basic bash usage,vim basics,SSH key setup"
+        data-order="1">
         <div class="card-body">
           <span class="post-series series-dotfiles card-series">⚙ My Dotfiles Explained</span>
           <div class="card-title">My .bashrc, .vimrc &amp; Aliases — Every Line Explained</div>
@@ -682,8 +898,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#dotfiles</span><span class="tag">#bash</span><span class="tag">#productivity</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: Linux 100 #12 -->
@@ -691,7 +920,9 @@
         data-series="linux"
         data-tags="linux find fleet mtime"
         data-date="2026-04-15"
-        data-title="Find All Files Modified in Last 24 Hours Across a Fleet">
+        data-title="Find All Files Modified in Last 24 Hours Across a Fleet"
+        data-prereqs="find command basics,SSH access to nodes,Basic shell scripting"
+        data-order="12">
         <div class="card-body">
           <span class="post-series series-linux card-series">◈ Linux 100</span>
           <div class="card-title">Find All Files Modified in Last 24 Hours Across a Fleet</div>
@@ -704,8 +935,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#linux</span><span class="tag">#find</span><span class="tag">#fleet</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: Dotfiles — tmux -->
@@ -713,7 +957,9 @@
         data-series="dotfiles"
         data-tags="dotfiles tmux terminal sessions devops"
         data-date="2026-04-14"
-        data-title="My tmux Config — Split Panes, Session Persistence & DevOps Shortcuts">
+        data-title="My tmux Config — Split Panes, Session Persistence & DevOps Shortcuts"
+        data-prereqs="tmux installed,Basic terminal usage,Read .bashrc post first"
+        data-order="2">
         <div class="card-body">
           <span class="post-series series-dotfiles card-series">⚙ My Dotfiles Explained</span>
           <div class="card-title">My tmux Config — Split Panes, Session Persistence &amp; DevOps Shortcuts</div>
@@ -726,8 +972,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#tmux</span><span class="tag">#dotfiles</span><span class="tag">#terminal</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: PE — Why I'm Moving -->
@@ -735,7 +994,9 @@
         data-series="pe"
         data-tags="platform-engineering career devops transition"
         data-date="2026-04-10"
-        data-title="Why I'm Moving from L3 Support to Platform Engineering">
+        data-title="Why I'm Moving from L3 Support to Platform Engineering"
+        data-prereqs="Some DevOps/ops experience,Curiosity about career growth"
+        data-order="1">
         <div class="card-body">
           <span class="post-series series-pe card-series">⬡ Platform Eng in Progress</span>
           <div class="card-title">Why I'm Moving from L3 Support to Platform Engineering</div>
@@ -748,8 +1009,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#career</span><span class="tag">#platform-eng</span><span class="tag">#devops</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: K8s — Pod Terminating -->
@@ -757,7 +1031,9 @@
         data-series="k8s"
         data-tags="kubernetes pods terminating finalizers pvc"
         data-date="2026-04-05"
-        data-title="Pod Stuck in Terminating — 4 Root Causes and How to Force It">
+        data-title="Pod Stuck in Terminating — 4 Root Causes and How to Force It"
+        data-prereqs="kubectl basics,Kubernetes cluster access,Basic understanding of Pods"
+        data-order="2">
         <div class="card-body">
           <span class="post-series series-k8s card-series">☸ Kubernetes War Stories</span>
           <div class="card-title">Pod Stuck in Terminating — 4 Root Causes and How to Force It</div>
@@ -770,8 +1046,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#kubernetes</span><span class="tag">#debugging</span><span class="tag">#finalizers</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: Linux 100 #08 -->
@@ -779,7 +1068,9 @@
         data-series="linux"
         data-tags="linux awk sed grep log analysis memory"
         data-date="2026-03-30"
-        data-title="Parse a 100K-Line Log File Without Loading It Into Memory">
+        data-title="Parse a 100K-Line Log File Without Loading It Into Memory"
+        data-prereqs="grep and awk basics,Access to log files,Basic piping in bash"
+        data-order="8">
         <div class="card-body">
           <span class="post-series series-linux card-series">◈ Linux 100</span>
           <div class="card-title">Parse a 100K-Line Log File Without Loading It Into Memory</div>
@@ -792,8 +1083,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#linux</span><span class="tag">#awk</span><span class="tag">#logs</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: Quick Tips — rsync vs scp -->
@@ -801,7 +1105,9 @@
         data-series="tips"
         data-tags="rsync scp file transfer linux"
         data-date="2026-03-25"
-        data-title="rsync vs scp — Which One and When">
+        data-title="rsync vs scp — Which One and When"
+        data-prereqs="Basic Linux CLI,SSH access"
+        data-order="1">
         <div class="card-body">
           <span class="post-series series-tips card-series">◎ Quick Tips</span>
           <div class="card-title">rsync vs scp — Which One and When</div>
@@ -814,8 +1120,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#rsync</span><span class="tag">#scp</span><span class="tag">#linux</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- POST: PE — CKA Prep -->
@@ -823,7 +1142,9 @@
         data-series="pe"
         data-tags="cka kubernetes certification exam cloud ops"
         data-date="2026-03-20"
-        data-title="CKA Prep After 7+ Years of Cloud Ops — What Surprised Me">
+        data-title="CKA Prep After 7+ Years of Cloud Ops — What Surprised Me"
+        data-prereqs="Kubernetes cluster experience,kubectl comfort,Cloud ops background"
+        data-order="2">
         <div class="card-body">
           <span class="post-series series-pe card-series">⬡ Platform Eng in Progress</span>
           <div class="card-title">CKA Prep After 7+ Years of Cloud Ops — What Surprised Me</div>
@@ -836,8 +1157,21 @@
             </div>
           </div>
           <div class="card-tags"><span class="tag">#cka</span><span class="tag">#kubernetes</span><span class="tag">#certification</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span>
+              <span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
         </div>
-        <div class="card-arrow" aria-hidden="true">→</div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
       </article>
 
       <!-- ╚═══ END OF POSTS — new posts go above this line ═══╝ -->
@@ -941,6 +1275,43 @@
   </aside>
 </main>
 
+<!-- ═══ SERIES PROGRESS TRACKER ════════════════════════════
+     Floating panel — tracks read posts per ordered series.
+     Persists to localStorage. Toggle via button bottom-left.
+════════════════════════════════════════════════════════ -->
+<div id="series-tracker" role="dialog" aria-label="Series progress tracker">
+  <div class="tracker-header">
+    <div class="tracker-title">
+      <span class="t-dot-live"></span>
+      series_progress
+    </div>
+    <span class="tracker-close" onclick="closeTracker()" title="Close">✕</span>
+  </div>
+  <div class="tracker-series-tabs" id="tracker-tabs"></div>
+  <div class="tracker-body">
+    <div class="tracker-progress-row">
+      <div class="tracker-fraction"><span id="tr-done">0</span>/<span id="tr-total">0</span></div>
+      <div class="tracker-pct" id="tr-pct">0% complete</div>
+    </div>
+    <div class="tracker-bar-wrap">
+      <div class="tracker-bar-fill" id="tr-bar" style="width:0%"></div>
+    </div>
+    <div class="tracker-posts" id="tr-posts"></div>
+    <div class="tracker-cta">
+      <span onclick="resetSeriesProgress()">reset progress</span>
+      &nbsp;·&nbsp;
+      <span onclick="markAllRead()">mark all read</span>
+    </div>
+  </div>
+</div>
+
+<!-- Tracker toggle button -->
+<button id="tracker-btn" onclick="toggleTracker()" aria-label="Open series progress tracker">
+  <span class="tb-icon">📈</span>
+  <span>series progress</span>
+  <span class="tb-count" id="tb-count">0</span>
+</button>
+
 <!-- ═══ FOOTER ════════════════════════════════════════════ -->
 <footer>
   <div class="footer-inner">
@@ -963,7 +1334,7 @@
      JAVASCRIPT
 ════════════════════════════════════════════════════════ -->
 <script>
-// ── Reading progress ──────────────────────────────────────
+// ── Page reading progress bar ────────────────────────────
 window.addEventListener('scroll', () => {
   const el  = document.documentElement;
   const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
@@ -973,17 +1344,18 @@ window.addEventListener('scroll', () => {
 // ── Post index ────────────────────────────────────────────
 function getPosts() {
   return Array.from(document.querySelectorAll('#posts-grid .post-card')).map(c => ({
-    el:     c,
-    series: c.dataset.series || '',
-    tags:   c.dataset.tags   || '',
-    date:   c.dataset.date   || '',
-    title:  c.dataset.title  || c.querySelector('.card-title')?.textContent || ''
+    el:      c,
+    series:  c.dataset.series  || '',
+    tags:    c.dataset.tags    || '',
+    date:    c.dataset.date    || '',
+    title:   c.dataset.title   || c.querySelector('.card-title')?.textContent || '',
+    prereqs: c.dataset.prereqs || '',
+    order:   parseInt(c.dataset.order) || 0
   }));
 }
 
 // ── Filter ────────────────────────────────────────────────
 function filterPosts(series, btn) {
-  // update buttons
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) {
     btn.classList.add('active');
@@ -992,7 +1364,6 @@ function filterPosts(series, btn) {
       .find(b => b.getAttribute('onclick')?.includes("'" + series + "'"));
     if (match) match.classList.add('active');
   }
-  // show/hide cards
   let visible = 0;
   getPosts().forEach(p => {
     const show = series === 'all' || p.series === series;
@@ -1017,11 +1388,11 @@ function updateCounts() {
   const posts  = getPosts();
   const counts = {};
   posts.forEach(p => { counts[p.series] = (counts[p.series] || 0) + 1; });
-  const total = posts.length;
-  document.getElementById('fc-all').textContent    = total;
-  document.getElementById('stat-total').innerHTML  = total + '<span>+</span>';
+  const total  = posts.length;
+  document.getElementById('fc-all').textContent   = total;
+  document.getElementById('stat-total').innerHTML = total + '<span>+</span>';
   ['linux','k8s','pe','dotfiles','tif','tips'].forEach(s => {
-    const n = counts[s] || 0;
+    const n  = counts[s] || 0;
     const fc = document.getElementById('fc-' + s);
     const sb = document.getElementById('sb-' + s);
     if (fc) fc.textContent = n;
@@ -1029,7 +1400,7 @@ function updateCounts() {
   });
 }
 
-// ── Latest sidebar (top 4 by date) ───────────────────────
+// ── Latest sidebar ────────────────────────────────────────
 function buildLatest() {
   const top4 = getPosts()
     .sort((a,b) => b.date.localeCompare(a.date))
@@ -1071,7 +1442,6 @@ function initObserver() {
 }
 
 // ── Load more ─────────────────────────────────────────────
-// Wire this to your CMS/API to fetch more posts dynamically.
 function loadMore() {
   const btn = document.getElementById('load-more-btn');
   btn.classList.add('loading'); btn.disabled = true;
@@ -1137,11 +1507,212 @@ function showToast(msg, isErr) {
   t._timer = setTimeout(() => t.classList.remove('show'), 3200);
 }
 
+// ══════════════════════════════════════════════════════════
+// FEATURE 1: PREREQUISITES
+// Reads data-prereqs="item1,item2" from each card, injects
+// pill elements and handles accordion toggle.
+// ══════════════════════════════════════════════════════════
+function initPrerequisites() {
+  getPosts().forEach(p => {
+    const block = p.el.querySelector('.prereq-block');
+    if (!p.prereqs) { if (block) block.style.display = 'none'; return; }
+    const pillContainer = p.el.querySelector('.prereq-pills');
+    if (!pillContainer) return;
+    p.prereqs.split(',').forEach(item => {
+      const pill = document.createElement('span');
+      pill.className   = 'prereq-pill';
+      pill.textContent = item.trim();
+      pillContainer.appendChild(pill);
+    });
+  });
+}
+
+function togglePrereq(toggleEl) {
+  event.stopPropagation();
+  toggleEl.closest('.prereq-block').classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════════════
+// FEATURE 2: READ RING — per-card circular progress indicator
+// Click ring to mark a post read/unread.
+// State persists to localStorage keyed by post title.
+// ══════════════════════════════════════════════════════════
+const RING_R = 15;
+const RING_C = 2 * Math.PI * RING_R;
+
+function buildRing(wrap) {
+  wrap.innerHTML = `
+    <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+      <circle class="read-ring-bg" cx="19" cy="19" r="${RING_R}"/>
+      <circle class="read-ring-fg" cx="19" cy="19" r="${RING_R}"
+        stroke-dasharray="${RING_C}" stroke-dashoffset="${RING_C}"/>
+    </svg>
+    <div class="read-ring-label">–</div>`;
+}
+
+function setRingProgress(wrap, pct, isDone) {
+  const fg    = wrap.querySelector('.read-ring-fg');
+  const label = wrap.querySelector('.read-ring-label');
+  if (!fg || !label) return;
+  fg.style.strokeDashoffset = RING_C - (RING_C * pct / 100);
+  if (isDone) {
+    wrap.classList.add('done');
+    label.textContent = '✓';
+  } else {
+    wrap.classList.remove('done');
+    label.textContent = pct > 0 ? pct + '%' : '–';
+  }
+}
+
+function getReadKey(title) { return 'read::' + title; }
+
+function loadReadState(wrap, title) {
+  try {
+    const pct  = parseInt(localStorage.getItem(getReadKey(title))) || 0;
+    setRingProgress(wrap, pct, pct >= 100);
+  } catch(e) {}
+}
+
+function toggleRead(wrap) {
+  event.stopPropagation();
+  const card  = wrap.closest('.post-card');
+  const title = card?.dataset.title || '';
+  if (!title) return;
+  try {
+    const pct  = parseInt(localStorage.getItem(getReadKey(title))) || 0;
+    const next = pct >= 100 ? 0 : 100;
+    localStorage.setItem(getReadKey(title), next);
+    setRingProgress(wrap, next, next >= 100);
+    showToast(next >= 100 ? '✓ Marked as read!' : 'Marked as unread');
+    refreshTrackerUI();
+    updateTrackerBtn();
+  } catch(e) {}
+}
+
+function initReadRings() {
+  getPosts().forEach(p => {
+    const wrap = p.el.querySelector('.read-ring-wrap');
+    if (!wrap) return;
+    buildRing(wrap);
+    loadReadState(wrap, p.title);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// FEATURE 3: SERIES PROGRESS TRACKER
+// Floating panel tracking read state per series.
+// Tabs for all series; progress bar + checklist.
+// ══════════════════════════════════════════════════════════
+const TRACKED_SERIES = [
+  { key: 'linux',    label: 'Linux 100'    },
+  { key: 'k8s',      label: 'Kubernetes'   },
+  { key: 'pe',       label: 'Platform Eng' },
+  { key: 'dotfiles', label: 'Dotfiles'     },
+  { key: 'tif',      label: 'Today I Fixed'},
+  { key: 'tips',     label: 'Quick Tips'   },
+];
+
+let trackerActiveSeries = 'linux';
+let trackerOpen = false;
+
+function buildTrackerTabs() {
+  const tabs = document.getElementById('tracker-tabs');
+  tabs.innerHTML = TRACKED_SERIES.map(s => `
+    <button class="tracker-tab ${s.key === trackerActiveSeries ? 'active' : ''}"
+      onclick="switchTrackerTab('${s.key}')">${s.label}</button>`
+  ).join('');
+}
+
+function switchTrackerTab(key) {
+  trackerActiveSeries = key;
+  document.querySelectorAll('.tracker-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent.trim() === (TRACKED_SERIES.find(s => s.key === key)?.label || ''));
+  });
+  refreshTrackerUI();
+}
+
+function refreshTrackerUI() {
+  const posts = getPosts().filter(p => p.series === trackerActiveSeries)
+    .sort((a,b) => a.order - b.order || a.date.localeCompare(b.date));
+  const total = posts.length;
+  let doneN   = 0;
+
+  const rows = posts.map(p => {
+    let pct = 0;
+    try { pct = parseInt(localStorage.getItem(getReadKey(p.title))) || 0; } catch(e) {}
+    const done = pct >= 100;
+    if (done) doneN++;
+    const shortTitle = p.title.length > 44 ? p.title.slice(0,42) + '…' : p.title;
+    return `<div class="tracker-post-row ${done ? 'done' : ''}" onclick="jumpToPost('${p.title.replace(/'/g,"\\'")}')">
+      <div class="tracker-check">${done ? '✓' : ''}</div>
+      <div class="tracker-post-title">${shortTitle}</div>
+    </div>`;
+  }).join('');
+
+  const pct = total > 0 ? Math.round((doneN / total) * 100) : 0;
+  document.getElementById('tr-done').textContent  = doneN;
+  document.getElementById('tr-total').textContent = total;
+  document.getElementById('tr-pct').textContent   = pct + '% complete';
+  document.getElementById('tr-bar').style.width   = pct + '%';
+  document.getElementById('tr-posts').innerHTML   = rows ||
+    '<div style="color:var(--dim);font-size:11px;font-family:var(--mono);padding:8px 0">No posts in this series yet.</div>';
+}
+
+function updateTrackerBtn() {
+  let doneN = 0;
+  getPosts().forEach(p => {
+    try { if ((parseInt(localStorage.getItem(getReadKey(p.title))) || 0) >= 100) doneN++; } catch(e) {}
+  });
+  document.getElementById('tb-count').textContent = doneN;
+}
+
+function toggleTracker() {
+  trackerOpen = !trackerOpen;
+  const panel = document.getElementById('series-tracker');
+  const btn   = document.getElementById('tracker-btn');
+  panel.classList.toggle('visible', trackerOpen);
+  btn.style.opacity      = trackerOpen ? '0' : '1';
+  btn.style.pointerEvents = trackerOpen ? 'none' : 'all';
+  if (trackerOpen) refreshTrackerUI();
+}
+
+function closeTracker() {
+  trackerOpen = false;
+  document.getElementById('series-tracker').classList.remove('visible');
+  document.getElementById('tracker-btn').style.opacity = '1';
+  document.getElementById('tracker-btn').style.pointerEvents = 'all';
+}
+
+function resetSeriesProgress() {
+  getPosts().filter(p => p.series === trackerActiveSeries).forEach(p => {
+    try { localStorage.removeItem(getReadKey(p.title)); } catch(e) {}
+    const wrap = p.el.querySelector('.read-ring-wrap');
+    if (wrap) setRingProgress(wrap, 0, false);
+  });
+  refreshTrackerUI(); updateTrackerBtn();
+  showToast('Progress reset for this series.');
+}
+
+function markAllRead() {
+  getPosts().filter(p => p.series === trackerActiveSeries).forEach(p => {
+    try { localStorage.setItem(getReadKey(p.title), '100'); } catch(e) {}
+    const wrap = p.el.querySelector('.read-ring-wrap');
+    if (wrap) setRingProgress(wrap, 100, true);
+  });
+  refreshTrackerUI(); updateTrackerBtn();
+  showToast('All posts marked as read!');
+}
+
 // ── Boot ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   updateCounts();
   buildLatest();
   initObserver();
+  initPrerequisites();
+  initReadRings();
+  buildTrackerTabs();
+  refreshTrackerUI();
+  updateTrackerBtn();
 });
 </script>
 
