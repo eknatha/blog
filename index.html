@@ -733,6 +733,88 @@
     .cs-hi     { color: var(--amber); }
     .cs-comment{ color: var(--dim); font-style: italic; display: block; padding-left: 12px; }
 
+    /* ═══ COMMAND OF THE DAY ════════════════════════════
+       Sidebar widget — date-seeded, rotates daily,
+       covers Linux · Kubernetes · Terraform · Git · Cloud
+    ════════════════════════════════════════════════════ */
+    .cotd-category {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--mono); font-size: 10px;
+      padding: 3px 10px; border-radius: 20px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .cotd-linux     { color: var(--green); background: var(--green-dim); border: 1px solid rgba(0,229,160,0.2); }
+    .cotd-k8s       { color: var(--blue);  background: rgba(74,158,255,0.08); border: 1px solid rgba(74,158,255,0.2); }
+    .cotd-terraform { color: #a78bfa;      background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); }
+    .cotd-git       { color: var(--amber); background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.2); }
+    .cotd-cloud     { color: #38bdf8;      background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); }
+
+    .cotd-command-wrap {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 7px; overflow: hidden; margin-bottom: 12px;
+    }
+    .cotd-cmd-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 10px; background: #0a0f14;
+      border-bottom: 1px solid var(--border);
+    }
+    .cotd-cmd-label { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+    .cotd-copy-btn {
+      font-family: var(--mono); font-size: 10px; color: var(--dim);
+      background: none; border: 1px solid var(--border);
+      border-radius: 3px; padding: 2px 8px; cursor: pointer;
+      transition: all var(--t);
+    }
+    .cotd-copy-btn:hover { color: var(--green); border-color: rgba(0,229,160,0.3); }
+    .cotd-cmd-body {
+      padding: 10px 12px; font-family: var(--mono);
+      font-size: 12px; line-height: 1.7;
+    }
+    .cotd-prompt { color: var(--green); }
+    .cotd-cmd    { color: var(--text); font-weight: 500; }
+    .cotd-flag   { color: var(--amber); }
+    .cotd-out    { display: block; color: var(--muted); padding-left: 4px; font-size: 11px; margin-top: 2px; }
+
+    .cotd-desc {
+      font-size: 12.5px; color: var(--muted);
+      line-height: 1.65; font-weight: 300; margin-bottom: 10px;
+    }
+    .cotd-flags { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .cotd-flag-row {
+      display: flex; gap: 8px; align-items: baseline;
+    }
+    .cotd-flag-name {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--amber); flex-shrink: 0; min-width: 80px;
+    }
+    .cotd-flag-desc { font-size: 11px; color: var(--dim); line-height: 1.4; }
+
+    .cotd-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 10px; border-top: 1px solid var(--border);
+    }
+    .cotd-date {
+      font-family: var(--mono); font-size: 10px; color: var(--dim);
+    }
+    .cotd-next-btn {
+      font-family: var(--mono); font-size: 10px; color: var(--muted);
+      background: none; border: 1px solid var(--border);
+      border-radius: 4px; padding: 4px 10px; cursor: pointer;
+      transition: all var(--t);
+    }
+    .cotd-next-btn:hover { color: var(--green); border-color: rgba(0,229,160,0.3); }
+
+    .cotd-nav-dots {
+      display: flex; gap: 4px; align-items: center; justify-content: center;
+      margin-top: 10px;
+    }
+    .cotd-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--border); cursor: pointer; transition: all var(--t);
+    }
+    .cotd-dot.active { background: var(--green); width: 14px; border-radius: 3px; }
+
     /* ═══ RESPONSIVE ════════════════════════════════════ */
     @media(max-width:900px) {
       .featured-post { grid-template-columns:1fr; }
@@ -1430,6 +1512,16 @@
       </div>
     </div>
 
+    <!-- COMMAND OF THE DAY -->
+    <div class="sidebar-widget" id="cotd-widget">
+      <div class="widget-header"><span class="w-icon">▸</span> command_of_the_day</div>
+      <div class="widget-body">
+        <!-- Populated by JS -->
+        <div id="cotd-content"></div>
+        <div class="cotd-nav-dots" id="cotd-dots"></div>
+      </div>
+    </div>
+
     <!-- NEWSLETTER -->
     <div class="sidebar-widget" id="newsletter">
       <div class="widget-header"><span class="w-icon">▸</span> subscribe</div>
@@ -1897,6 +1989,744 @@ function copySnippet(btn) {
   }).catch(() => showToast('Copy not supported in this browser', true));
 }
 
+// ══════════════════════════════════════════════════════════
+// COMMAND OF THE DAY
+// 60 commands across Linux · Kubernetes · Terraform · Git · Cloud
+// Date-seeded rotation — same command all day, new one tomorrow.
+// User can also manually browse with next/prev dots.
+// ══════════════════════════════════════════════════════════
+const COTD_COMMANDS = [
+
+  // ── LINUX (12) ──────────────────────────────────────────
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'lsof +L1 | grep deleted',
+    flags: [
+      { name: '+L1',      desc: 'List files with link count less than 1 (deleted but still open)' },
+      { name: '| grep',   desc: 'Filter to only show "deleted" entries' },
+    ],
+    desc: 'Find files deleted on disk but still held open by a process — the classic reason df shows 100% but du shows less. Kill the PID or send HUP to free the space instantly.',
+    output: 'java  1847  /var/log/app.log (deleted)  27GB',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'find / -mtime -1 -type f -not \\( -path "/proc/*" -o -path "/sys/*" \\) 2>/dev/null',
+    flags: [
+      { name: '-mtime -1', desc: 'Modified within the last 24 hours' },
+      { name: '-type f',   desc: 'Files only, not directories' },
+      { name: '-not \\(…\\)', desc: 'Exclude /proc and /sys (virtual filesystems)' },
+    ],
+    desc: 'Find every file changed in the last 24 hours system-wide, excluding virtual filesystems. Useful for post-incident audits and change tracking.',
+    output: '/etc/nginx/nginx.conf\n/var/log/auth.log\n/tmp/.ICE-unix/1234',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'awk \'/ERROR/{count++} END{print count " errors"}\' app.log',
+    flags: [
+      { name: '/ERROR/',    desc: 'Match lines containing ERROR' },
+      { name: 'count++',    desc: 'Increment counter for each match' },
+      { name: 'END{print}', desc: 'Print after processing all lines' },
+    ],
+    desc: 'Count ERROR occurrences in a log file without loading it into memory. Runs in constant memory regardless of file size — safe to run on a 10GB log on a live server.',
+    output: '4821 errors',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'ss -tulnp | grep LISTEN',
+    flags: [
+      { name: '-t', desc: 'TCP sockets' },
+      { name: '-u', desc: 'UDP sockets' },
+      { name: '-l', desc: 'Listening sockets only' },
+      { name: '-n', desc: 'Show port numbers, not service names' },
+      { name: '-p', desc: 'Show process using the socket' },
+    ],
+    desc: 'Modern replacement for netstat. Shows all listening ports with the process owning them. Faster and more reliable — use this instead of netstat -tulnp.',
+    output: 'tcp LISTEN 0 128 0.0.0.0:80 *:* users:("nginx",pid=1234)',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'journalctl -u nginx --since "1 hour ago" -f',
+    flags: [
+      { name: '-u nginx',       desc: 'Filter to the nginx systemd unit' },
+      { name: '--since "…"',    desc: 'Show logs from this time onwards' },
+      { name: '-f',             desc: 'Follow — stream new lines in real time' },
+    ],
+    desc: 'Stream live nginx logs from systemd journal with a time filter. More powerful than tail -f /var/log/nginx/error.log because it includes crash restart events.',
+    output: 'Apr 21 03:22:11 nginx[1234]: 2026/04/21 03:22 [error] 28#28: *1 connect() failed',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'strace -p 1234 -e trace=network',
+    flags: [
+      { name: '-p 1234',        desc: 'Attach to running process with PID 1234' },
+      { name: '-e trace=network', desc: 'Only show network-related syscalls' },
+    ],
+    desc: 'Attach to a running process and trace only its network system calls in real time. Invaluable for debugging connection issues without restarting the process.',
+    output: 'connect(3, {sa_family=AF_INET, sin_port=htons(5432)}, 16) = -1 ECONNREFUSED',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'watch -n 2 "df -h | grep -v tmpfs"',
+    flags: [
+      { name: '-n 2',       desc: 'Refresh every 2 seconds' },
+      { name: 'grep -v tmpfs', desc: 'Exclude temporary filesystems for cleaner output' },
+    ],
+    desc: 'Live disk usage monitor that refreshes every 2 seconds. Useful when running a large copy or cleanup to watch space free up in real time.',
+    output: 'Filesystem  Size  Used  Avail  Use%\n/dev/sda1    50G   23G    27G   46%',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'ps aux --sort=-%mem | head -10',
+    flags: [
+      { name: 'aux',         desc: 'Show all processes with full details' },
+      { name: '--sort=-%mem', desc: 'Sort by memory descending (highest first)' },
+      { name: 'head -10',    desc: 'Show only the top 10 consumers' },
+    ],
+    desc: 'Find the top 10 memory-consuming processes instantly. First command to run when a node is OOMKilling or swap is thrashing.',
+    output: 'java    1234  8.2  24.1  4194304  java -Xmx2g MyApp',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'curl -o /dev/null -s -w "%{http_code} %{time_total}s\\n" https://api.example.com/health',
+    flags: [
+      { name: '-o /dev/null', desc: 'Discard response body' },
+      { name: '-s',           desc: 'Silent mode — no progress bar' },
+      { name: '-w "…"',       desc: 'Write out: HTTP code and total time' },
+    ],
+    desc: 'Quick health check that prints only the HTTP status code and response time. Perfect for one-liners in scripts or CI/CD pipelines.',
+    output: '200 0.142s',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'tar -czf backup-$(date +%Y%m%d).tar.gz /etc/nginx/',
+    flags: [
+      { name: '-c', desc: 'Create a new archive' },
+      { name: '-z', desc: 'Compress with gzip' },
+      { name: '-f', desc: 'Specify the output filename' },
+      { name: '$(date +%Y%m%d)', desc: 'Embed today\'s date in the filename' },
+    ],
+    desc: 'Create a dated gzip backup of nginx config. The date expansion means you never overwrite yesterday\'s backup — safe to run in cron daily.',
+    output: 'backup-20260421.tar.gz created (12KB)',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'grep -r "FATAL\\|ERROR" /var/log/ --include="*.log" -l',
+    flags: [
+      { name: '-r',              desc: 'Recursive — search all subdirectories' },
+      { name: '"FATAL\\|ERROR"', desc: 'Match lines with FATAL or ERROR' },
+      { name: '--include="*.log"', desc: 'Only search .log files' },
+      { name: '-l',              desc: 'Print only filenames, not matching lines' },
+    ],
+    desc: 'Find every log file under /var/log that contains FATAL or ERROR. Use -l first to identify which files to dig into, then drill down without scanning everything.',
+    output: '/var/log/app/worker.log\n/var/log/mysql/error.log',
+  },
+  {
+    category: 'linux', label: '🐧 Linux',
+    cmd: 'iostat -xz 1 5',
+    flags: [
+      { name: '-x', desc: 'Extended statistics (await, util%, etc.)' },
+      { name: '-z', desc: 'Omit devices with zero activity' },
+      { name: '1 5', desc: 'Sample every 1 second, 5 times' },
+    ],
+    desc: 'Monitor disk I/O performance in real time. Look at %util (saturation) and await (latency ms). If %util > 80% or await > 20ms, you have an I/O bottleneck.',
+    output: 'sda  r/s:142  w/s:89  await:4.2ms  %util:68.3',
+  },
+
+  // ── KUBERNETES (12) ─────────────────────────────────────
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl get pods -A --field-selector=status.phase!=Running',
+    flags: [
+      { name: '-A',              desc: 'All namespaces' },
+      { name: '--field-selector', desc: 'Server-side filter: only non-Running pods' },
+    ],
+    desc: 'Find all pods cluster-wide that are NOT in Running state — CrashLoopBackOff, Pending, Terminating. First command to run on a cluster health check.',
+    output: 'NAMESPACE  NAME              STATUS\npayment    api-6d4f9b  0/1   CrashLoopBackOff',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl top pods -A --sort-by=memory | head -10',
+    flags: [
+      { name: '-A',           desc: 'All namespaces' },
+      { name: '--sort-by=memory', desc: 'Sort by current memory usage descending' },
+    ],
+    desc: 'Find the top 10 memory-consuming pods cluster-wide. Run this before and after a deployment to confirm memory usage is stable. Requires metrics-server installed.',
+    output: 'NAMESPACE   NAME              CPU   MEMORY\nmonitoring  prometheus-0  820m  2.1Gi',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl rollout restart deployment/api-server -n production',
+    flags: [
+      { name: 'rollout restart', desc: 'Trigger a rolling restart with zero downtime' },
+      { name: '-n production',   desc: 'Target the production namespace' },
+    ],
+    desc: 'Gracefully restart all pods in a deployment without changing any spec. Useful for picking up new ConfigMap values, refreshing secrets, or recovering hung pods.',
+    output: 'deployment.apps/api-server restarted',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl exec -it pod/debug-pod -n default -- /bin/sh',
+    flags: [
+      { name: '-it',   desc: 'Interactive TTY — attach stdin and allocate pseudo-terminal' },
+      { name: '--',    desc: 'Separator between kubectl args and container command' },
+      { name: '/bin/sh', desc: 'Shell to launch inside the container' },
+    ],
+    desc: 'Open an interactive shell inside a running container for live debugging. Use when logs alone aren\'t enough — check filesystem, env vars, network connectivity.',
+    output: '/ # curl http://postgres-svc:5432  (test internal connectivity)',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl get events --sort-by=.lastTimestamp -n production | tail -20',
+    flags: [
+      { name: '--sort-by=.lastTimestamp', desc: 'Sort events chronologically, newest last' },
+      { name: '| tail -20',              desc: 'Show only the 20 most recent events' },
+    ],
+    desc: 'See the 20 most recent cluster events in a namespace, sorted by time. Faster than kubectl describe for spotting OOMKilled, FailedScheduling, or ImagePullBackOff.',
+    output: 'Warning  OOMKilling  Node  Memory cgroup out of memory: Kill process 1847',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl patch pod nginx-77d9 -p \'{"metadata":{"finalizers":null}}\'',
+    flags: [
+      { name: 'patch',            desc: 'Merge-patch the resource spec or metadata' },
+      { name: '{"finalizers":null}', desc: 'Set finalizers to empty — removes the deletion block' },
+    ],
+    desc: 'Force-remove a pod stuck in Terminating state by clearing its finalizers. Use this when a pod has been Terminating for more than a few minutes and --force isn\'t working.',
+    output: 'pod/nginx-77d9 patched  →  Terminated immediately',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl run debug --image=nicolaka/netshoot --rm -it --restart=Never -- bash',
+    flags: [
+      { name: '--image=nicolaka/netshoot', desc: 'Swiss-army network debug image (curl, dig, tcpdump etc.)' },
+      { name: '--rm',                      desc: 'Auto-delete the pod when the shell exits' },
+      { name: '--restart=Never',           desc: 'Run as a one-shot pod, not a deployment' },
+    ],
+    desc: 'Spin up a temporary network debug pod in the cluster that self-destructs when you exit. Use to test DNS resolution, service connectivity, and network policies from inside the cluster.',
+    output: 'bash-5.1# dig postgres-svc.production.svc.cluster.local',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl describe node prod-node-01 | grep -A5 "Allocated resources"',
+    flags: [
+      { name: 'describe node',       desc: 'Full node details including resource allocation' },
+      { name: '| grep -A5 "Alloc…"', desc: 'Show Allocated resources section and 5 lines after' },
+    ],
+    desc: 'Check how much CPU and memory is allocated vs available on a specific node. Use this when pods are Pending — often the node is overcommitted even if it looks idle.',
+    output: 'CPU:    1850m/2000m (92%)  ← nearly full\nMemory: 6.2Gi/7.5Gi  (82%)',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl create secret generic db-creds --from-literal=password=s3cr3t --dry-run=client -o yaml',
+    flags: [
+      { name: '--from-literal',     desc: 'Create secret from key=value pairs directly' },
+      { name: '--dry-run=client',   desc: 'Generate YAML without creating the resource' },
+      { name: '-o yaml',            desc: 'Output as YAML — pipe to kubectl apply or save to file' },
+    ],
+    desc: 'Generate a secret manifest without touching the cluster. Pipe it to kubectl apply -f or save for GitOps. Never hardcode secrets in YAML committed to git.',
+    output: 'apiVersion: v1\nkind: Secret\ndata:\n  password: czNjcjN0',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl logs deployment/api-server --since=1h --tail=100 -f',
+    flags: [
+      { name: '--since=1h', desc: 'Only show logs from the last hour' },
+      { name: '--tail=100', desc: 'Start with the last 100 lines' },
+      { name: '-f',         desc: 'Follow — stream new lines in real time' },
+    ],
+    desc: 'Stream live logs from all pods in a deployment simultaneously. kubectl handles pod selection automatically — no need to specify individual pod names.',
+    output: 'Found 3 pods, using pod/api-server-7d9f8-xk2p\n[INFO] Request received: GET /health',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'kubectl diff -f deployment.yaml',
+    flags: [
+      { name: 'diff',            desc: 'Compare local manifest against live cluster state' },
+      { name: '-f deployment.yaml', desc: 'The manifest file to compare' },
+    ],
+    desc: 'Preview exactly what will change before applying a manifest — like a dry-run but shows a proper diff. Essential habit before kubectl apply in production.',
+    output: '-  replicas: 2\n+  replicas: 3\n-  image: app:v1.2\n+  image: app:v1.3',
+  },
+  {
+    category: 'k8s', label: '☸ Kubernetes',
+    cmd: 'ETCDCTL_API=3 etcdctl snapshot save /tmp/etcd-backup.db --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key',
+    flags: [
+      { name: 'snapshot save', desc: 'Create a point-in-time backup of the etcd database' },
+      { name: '--cacert/--cert/--key', desc: 'TLS certificates for authenticating with etcd' },
+    ],
+    desc: 'Create an etcd snapshot — the most critical Kubernetes backup. Memorize this command for CKA. Store snapshot off-node. Can restore an entire cluster from this file.',
+    output: 'Snapshot saved at /tmp/etcd-backup.db  (12MB)',
+  },
+
+  // ── TERRAFORM (12) ──────────────────────────────────────
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform plan -out=tfplan -var-file=prod.tfvars',
+    flags: [
+      { name: '-out=tfplan',         desc: 'Save the plan to a file for deterministic apply' },
+      { name: '-var-file=prod.tfvars', desc: 'Load variable values from this file' },
+    ],
+    desc: 'Generate and save a plan for production. Always save plans with -out when working on prod — the apply step will execute exactly what was planned, not a fresh re-plan.',
+    output: 'Plan: 3 to add, 1 to change, 0 to destroy.',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform state list | grep aws_instance',
+    flags: [
+      { name: 'state list',        desc: 'List all resources tracked in terraform state' },
+      { name: '| grep aws_instance', desc: 'Filter to only EC2 instances' },
+    ],
+    desc: 'List all EC2 instances managed by this Terraform workspace. Useful when you need to find a specific resource address before moving, importing, or tainting it.',
+    output: 'aws_instance.web[0]\naws_instance.web[1]\naws_instance.bastion',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform import aws_s3_bucket.my_bucket my-existing-bucket-name',
+    flags: [
+      { name: 'import',                   desc: 'Bring an existing resource under Terraform management' },
+      { name: 'aws_s3_bucket.my_bucket',  desc: 'Terraform resource address to map it to' },
+      { name: 'my-existing-bucket-name',  desc: 'The real AWS resource ID to import' },
+    ],
+    desc: 'Import an existing AWS S3 bucket into Terraform state without destroying and recreating it. Essential when taking over manually-created infrastructure.',
+    output: 'aws_s3_bucket.my_bucket: Import prepared!\nImport successful!',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform workspace new staging && terraform workspace select staging',
+    flags: [
+      { name: 'workspace new',    desc: 'Create a new isolated workspace with separate state' },
+      { name: 'workspace select', desc: 'Switch to a different workspace' },
+    ],
+    desc: 'Create and switch to a staging workspace. Workspaces give you separate state files per environment — same code, different state. Use for dev/staging/prod isolation.',
+    output: 'Created and switched to workspace "staging"',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform state mv aws_instance.old_name aws_instance.new_name',
+    flags: [
+      { name: 'state mv',          desc: 'Move a resource to a new address in state' },
+      { name: 'aws_instance.old…', desc: 'Current resource address' },
+      { name: 'aws_instance.new…', desc: 'Target resource address after rename' },
+    ],
+    desc: 'Rename a resource in state without destroying it. Use this when you refactor your Terraform code and rename a resource block — prevents Terraform from deleting and recreating it.',
+    output: 'Move "aws_instance.old_name" to "aws_instance.new_name"\nSuccessfully moved 1 object(s).',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform taint aws_instance.web && terraform plan',
+    flags: [
+      { name: 'taint',           desc: 'Mark a resource for destruction and recreation on next apply' },
+      { name: '&& terraform plan', desc: 'Immediately preview what will be recreated' },
+    ],
+    desc: 'Force-recreate a specific resource on the next terraform apply. Use when an EC2 instance has drifted from desired state but the config hasn\'t changed.',
+    output: 'Resource instance aws_instance.web has been marked as tainted.',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform output -json | jq \'.rds_endpoint.value\'',
+    flags: [
+      { name: '-json',     desc: 'Output all outputs as JSON' },
+      { name: 'jq \'.…\'', desc: 'Extract a specific output value' },
+    ],
+    desc: 'Extract a specific Terraform output value as a string — useful in scripts and CI/CD pipelines that need the RDS endpoint, ALB DNS, or VPC ID from the Terraform state.',
+    output: '"prod-db.cluster-abc123.us-east-1.rds.amazonaws.com"',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform validate && terraform fmt -recursive',
+    flags: [
+      { name: 'validate',       desc: 'Check configuration syntax and internal consistency' },
+      { name: 'fmt -recursive', desc: 'Auto-format all .tf files in current dir and subdirs' },
+    ],
+    desc: 'Validate and auto-format your Terraform code. Run this before every commit in CI. fmt is non-destructive — only whitespace and alignment, never logic.',
+    output: 'Success! The configuration is valid.\n3 files reformatted.',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform apply -target=aws_security_group.allow_http -auto-approve',
+    flags: [
+      { name: '-target=…',     desc: 'Apply only this specific resource and its dependencies' },
+      { name: '-auto-approve', desc: 'Skip interactive confirmation (use with caution in prod)' },
+    ],
+    desc: 'Apply only a specific resource without touching everything else. Useful for emergency fixes — change a security group rule without triggering a full plan.',
+    output: 'Apply complete! Resources: 1 added, 0 changed, 0 destroyed.',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform show -json tfplan | jq \'.resource_changes[] | select(.change.actions[] == "delete")\' ',
+    flags: [
+      { name: 'show -json tfplan', desc: 'Parse a saved plan file as JSON' },
+      { name: 'select(.change.actions[] == "delete")', desc: 'Filter to only destructive changes' },
+    ],
+    desc: 'Programmatically inspect a saved plan for any deletions before applying. Pipe into a CI gate that fails the pipeline if any deletions are found unexpectedly.',
+    output: '{"address": "aws_rds_instance.prod", "actions": ["delete"]}  ← blocked!',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform providers lock -platform=linux_amd64 -platform=darwin_arm64',
+    flags: [
+      { name: 'providers lock',     desc: 'Generate or update .terraform.lock.hcl' },
+      { name: '-platform=…',        desc: 'Lock checksums for specific OS/arch combos' },
+    ],
+    desc: 'Lock provider versions for multiple platforms (Linux CI + Mac dev machines). Commit .terraform.lock.hcl to git — ensures everyone uses exactly the same provider binary.',
+    output: 'Success! Lockfile written to: .terraform.lock.hcl',
+  },
+  {
+    category: 'terraform', label: '🔷 Terraform',
+    cmd: 'terraform graph | dot -Tsvg > infra-graph.svg',
+    flags: [
+      { name: 'graph',      desc: 'Output resource dependency graph in DOT format' },
+      { name: 'dot -Tsvg',  desc: 'Render DOT to SVG (requires graphviz installed)' },
+    ],
+    desc: 'Visualize your entire Terraform resource dependency graph as an SVG. Open in browser to understand the order resources will be created/destroyed.',
+    output: 'infra-graph.svg generated  (open in browser)',
+  },
+
+  // ── GIT (12) ────────────────────────────────────────────
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git log --oneline --graph --decorate --all',
+    flags: [
+      { name: '--oneline',  desc: 'Compact one-line format per commit' },
+      { name: '--graph',    desc: 'Draw ASCII branch/merge graph' },
+      { name: '--decorate', desc: 'Show branch and tag names' },
+      { name: '--all',      desc: 'Show all branches, not just current' },
+    ],
+    desc: 'The most useful git log view. See your entire branch history as a visual graph. Add to your .gitconfig as an alias: git config --global alias.lg "log --oneline --graph --decorate --all"',
+    output: '* a1b2c3d (HEAD → main) fix: nginx config\n| * e4f5g6h (feature/k8s) feat: add HPA',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git stash push -m "WIP: nginx config changes" && git stash list',
+    flags: [
+      { name: 'stash push', desc: 'Save current uncommitted changes to stash stack' },
+      { name: '-m "…"',     desc: 'Label the stash with a descriptive message' },
+      { name: 'stash list', desc: 'Show all stashes with their indices' },
+    ],
+    desc: 'Save work in progress before switching branches — always use -m to label stashes, because stash@{0} is meaningless a week later. Pop with git stash pop.',
+    output: 'stash@{0}: On main: WIP: nginx config changes',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git rebase -i HEAD~3',
+    flags: [
+      { name: '-i',       desc: 'Interactive mode — edit, squash, reorder, drop commits' },
+      { name: 'HEAD~3',   desc: 'Rebase the last 3 commits' },
+    ],
+    desc: 'Interactively rewrite the last 3 commits — squash WIP commits, rewrite messages, reorder. Use before merging a feature branch to keep history clean. Never rebase shared branches.',
+    output: 'pick a1b2c3 fix: attempt 1\nsquash b2c3d4 fix: attempt 2\npick c3d4e5 feat: final impl',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git bisect start && git bisect bad HEAD && git bisect good v1.2.0',
+    flags: [
+      { name: 'bisect start', desc: 'Begin binary search through commit history' },
+      { name: 'bisect bad',   desc: 'Mark current commit as broken' },
+      { name: 'bisect good',  desc: 'Mark a known-good commit or tag' },
+    ],
+    desc: 'Binary search to find the exact commit that introduced a bug. Git checks out the midpoint — you test and mark good/bad. Finds the culprit in O(log n) steps.',
+    output: 'Bisecting: 23 revisions left to test (roughly 5 steps)',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git cherry-pick a1b2c3d4 --no-commit',
+    flags: [
+      { name: 'cherry-pick', desc: 'Apply the changes from a specific commit to the current branch' },
+      { name: '--no-commit',  desc: 'Apply changes to working tree but don\'t commit — lets you review first' },
+    ],
+    desc: 'Bring a specific commit from another branch without creating a new commit immediately. Use when you need one hotfix from a feature branch in production.',
+    output: 'Applied: fix: null pointer in payment handler',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git diff main...feature/k8s-hpa --stat',
+    flags: [
+      { name: 'main...feature', desc: 'Three-dot: diff from the common ancestor, not the tips' },
+      { name: '--stat',         desc: 'Summary of changed files and line counts' },
+    ],
+    desc: 'See what a feature branch has changed relative to where it diverged from main. Three dots (not two) means "what did this branch add since it branched off" — the PR diff.',
+    output: 'k8s/hpa.yaml   | 42 +++\nk8s/deploy.yaml | 8 +--\n2 files changed, 47 insertions(+)',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git reflog | head -20',
+    flags: [
+      { name: 'reflog', desc: 'Show a log of every HEAD movement including resets and rebases' },
+      { name: '| head -20', desc: 'Show only the most recent 20 entries' },
+    ],
+    desc: 'Recover lost commits after an accidental git reset --hard. reflog records every position HEAD has been in for 90 days. Find the hash and git checkout to recover.',
+    output: 'a1b2c3 HEAD@{1}: reset: moving to HEAD~2  ← your "lost" commit',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git shortlog -sn --no-merges | head -10',
+    flags: [
+      { name: '-s',           desc: 'Summarize — just show commit count, not messages' },
+      { name: '-n',           desc: 'Sort by number of commits descending' },
+      { name: '--no-merges',  desc: 'Exclude merge commits from the count' },
+    ],
+    desc: 'Leaderboard of contributors by commit count. Useful for attribution, recognition, and understanding who owns which parts of the codebase.',
+    output: '   142  Eknatha\n    67  alice\n    34  bob',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git clean -fdx --dry-run',
+    flags: [
+      { name: '-f', desc: 'Force — required to actually delete files' },
+      { name: '-d', desc: 'Remove untracked directories too' },
+      { name: '-x', desc: 'Remove ignored files too (build artifacts, .env)' },
+      { name: '--dry-run', desc: 'Preview what would be deleted without deleting it' },
+    ],
+    desc: 'Preview then clean all untracked files including build artifacts and ignored files. Always run --dry-run first — this operation cannot be undone.',
+    output: 'Would remove dist/\nWould remove .env\nWould remove node_modules/',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git tag -a v1.3.0 -m "Release v1.3.0" && git push origin v1.3.0',
+    flags: [
+      { name: '-a v1.3.0', desc: 'Create an annotated tag (stores tagger, date, message)' },
+      { name: '-m "…"',    desc: 'Tag message — required for annotated tags' },
+      { name: 'push origin v1.3.0', desc: 'Push the tag to remote (tags are not pushed by default)' },
+    ],
+    desc: 'Create and push a release tag. Annotated tags (with -a) are preferred over lightweight tags — they store metadata and show up properly in GitHub releases.',
+    output: 'To github.com:eknathareddyp/app.git\n * [new tag]  v1.3.0 → v1.3.0',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git blame -L 42,55 src/app.py',
+    flags: [
+      { name: '-L 42,55',   desc: 'Annotate only lines 42 through 55' },
+      { name: 'src/app.py', desc: 'The file to annotate' },
+    ],
+    desc: 'Find who changed lines 42-55 of a file and in which commit. Essential for understanding context before changing critical code — or for the classic "who wrote this?"',
+    output: 'a1b2c3 (Eknatha 2026-03-15 14:22) def handle_payment():',
+  },
+  {
+    category: 'git', label: '🌿 Git',
+    cmd: 'git config --global alias.undo "reset HEAD~1 --mixed"',
+    flags: [
+      { name: 'config --global', desc: 'Set in your global ~/.gitconfig' },
+      { name: 'alias.undo',      desc: 'Create a command alias: git undo' },
+      { name: 'reset HEAD~1 --mixed', desc: 'Undo last commit, keep changes unstaged' },
+    ],
+    desc: 'Create a git undo alias that undoes your last commit while keeping the changes in your working tree. Safer than --hard reset — nothing is lost.',
+    output: 'Now use: git undo  (undoes last commit, keeps changes)',
+  },
+
+  // ── CLOUD (12) ──────────────────────────────────────────
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws ec2 describe-instances --filters "Name=tag:Env,Values=prod" --query "Reservations[].Instances[].[InstanceId,State.Name,PrivateIpAddress]" --output table',
+    flags: [
+      { name: '--filters',  desc: 'Filter instances by tag key/value pair' },
+      { name: '--query',    desc: 'JMESPath expression to select specific fields' },
+      { name: '--output table', desc: 'Render as ASCII table instead of JSON' },
+    ],
+    desc: 'List all production EC2 instances with their IDs, state, and private IPs in a readable table. Replace the tag values with your own env tagging convention.',
+    output: '| i-0abc123 | running | 10.0.4.22 |\n| i-0def456 | running | 10.0.4.23 |',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws logs tail /aws/lambda/my-function --follow --since 1h',
+    flags: [
+      { name: 'logs tail',  desc: 'Stream CloudWatch log group in real time' },
+      { name: '--follow',   desc: 'Keep streaming new log events as they arrive' },
+      { name: '--since 1h', desc: 'Start from 1 hour ago' },
+    ],
+    desc: 'Stream Lambda function logs live from CloudWatch — like tail -f but for serverless. Far faster than opening the AWS console. Works with any CloudWatch log group.',
+    output: '2026-04-21T03:22:11  START RequestId: abc-123\n2026-04-21T03:22:11  ERROR: Connection refused',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws s3 sync ./dist s3://my-bucket/app/ --delete --cache-control max-age=86400',
+    flags: [
+      { name: 'sync',          desc: 'Copy only changed files (delta sync)' },
+      { name: '--delete',      desc: 'Remove files in S3 that no longer exist locally' },
+      { name: '--cache-control', desc: 'Set Cache-Control header on all uploaded objects' },
+    ],
+    desc: 'Deploy a static site to S3 efficiently — only uploads changed files, removes deleted files, and sets cache headers. The --delete flag is essential for keeping S3 in sync.',
+    output: 'upload: dist/app.js to s3://my-bucket/app/app.js\ndelete: s3://my-bucket/app/old.js',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws ecs update-service --cluster prod --service api --force-new-deployment',
+    flags: [
+      { name: '--cluster prod',      desc: 'Target ECS cluster name' },
+      { name: '--service api',       desc: 'ECS service to update' },
+      { name: '--force-new-deployment', desc: 'Trigger a rolling deployment even if nothing changed' },
+    ],
+    desc: 'Force a rolling restart of an ECS service without changing any config — equivalent to kubectl rollout restart for ECS. Useful for picking up new Secrets Manager values.',
+    output: 'service/api updated — rolling deployment triggered',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization --dimensions Name=InstanceId,Value=i-0abc123 --start-time 2026-04-21T00:00:00Z --end-time 2026-04-21T01:00:00Z --period 300 --statistics Average --output table',
+    flags: [
+      { name: '--metric-name',  desc: 'CloudWatch metric to query' },
+      { name: '--period 300',   desc: 'Aggregation period in seconds (5 min)' },
+      { name: '--statistics',   desc: 'Aggregation function: Average, Sum, Max, Min' },
+    ],
+    desc: 'Pull CPU metrics for a specific EC2 instance from CloudWatch for a time range. Use for post-incident analysis or to verify performance before and after a change.',
+    output: '| 03:00 | 12.3% |\n| 03:05 | 78.9% |  ← spike during deploy',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'az vm list --resource-group prod-rg --output table',
+    flags: [
+      { name: '--resource-group', desc: 'Filter to a specific Azure resource group' },
+      { name: '--output table',   desc: 'Render as ASCII table' },
+    ],
+    desc: 'List all VMs in an Azure resource group with their names, location, and status. The Azure CLI equivalent of the AWS describe-instances command.',
+    output: 'Name         Location    ProvisioningState\nprod-web-01  eastus      Succeeded',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'az aks get-credentials --resource-group prod-rg --name prod-aks --overwrite-existing',
+    flags: [
+      { name: '--resource-group', desc: 'Resource group containing the AKS cluster' },
+      { name: '--name',           desc: 'Name of the AKS cluster' },
+      { name: '--overwrite-existing', desc: 'Replace existing kubeconfig entry for this cluster' },
+    ],
+    desc: 'Fetch kubeconfig credentials for an Azure AKS cluster and merge into ~/.kube/config. Run this to switch between different AKS clusters or after cluster recreation.',
+    output: 'Merged "prod-aks" as current context in /home/eknatha/.kube/config',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws ssm start-session --target i-0abc123',
+    flags: [
+      { name: 'start-session', desc: 'Open a secure shell session via AWS Systems Manager' },
+      { name: '--target',      desc: 'EC2 instance ID to connect to' },
+    ],
+    desc: 'SSH into an EC2 instance without opening port 22 — all traffic goes through AWS Systems Manager. No key pairs, no security group changes. Works even in private subnets.',
+    output: 'Starting session with SessionId: eknatha-0abc123\n$ whoami\nssm-user',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws iam get-account-authorization-details --filter User --query "UserDetailList[].{User:UserName,MFA:MFADevices}" --output table',
+    flags: [
+      { name: '--filter User',  desc: 'Return only IAM user details (not roles/groups)' },
+      { name: '--query "…"',    desc: 'JMESPath to extract username and MFA device list' },
+    ],
+    desc: 'Audit which IAM users have MFA enabled. Users with an empty MFADevices list have no MFA — a security risk in any AWS account.',
+    output: '| alice | [{SerialNumber: arn:aws:iam::...}] |\n| bob   | []  ← no MFA!',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'gcloud compute instances list --filter="status=RUNNING AND zone:us-central1" --format="table(name,zone,machineType,networkInterfaces[0].accessConfigs[0].natIP)"',
+    flags: [
+      { name: '--filter="…"',  desc: 'Server-side filter: running instances in a specific zone' },
+      { name: '--format="table(…)"', desc: 'Custom table columns using field selectors' },
+    ],
+    desc: 'List running GCP instances in a region with their external IPs in a clean table. The --format flag is extremely powerful — you can extract any field from the JSON response.',
+    output: 'NAME          ZONE          MACHINE_TYPE  EXTERNAL_IP\nprod-web-01   us-central1-a  e2-medium     34.122.x.x',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws cost-optimization-hub list-recommendations --filter "actionType=Rightsize" --output json | jq \'.items[] | {resource:.resourceId, saving:.estimatedMonthlySavings}\' | head -20',
+    flags: [
+      { name: '--filter "actionType=Rightsize"', desc: 'Only show rightsizing recommendations' },
+      { name: 'jq \'{resource, saving}\'',       desc: 'Extract resource ID and savings estimate' },
+    ],
+    desc: 'Pull AWS rightsizing recommendations with monthly savings estimates. Run quarterly to find over-provisioned EC2, RDS, or ElasticSearch instances you can downsize.',
+    output: '{"resource": "i-0abc123", "saving": "$148.20/mo"}',
+  },
+  {
+    category: 'cloud', label: '☁️ Cloud',
+    cmd: 'aws rds create-db-snapshot --db-instance-identifier prod-postgres --db-snapshot-identifier prod-postgres-$(date +%Y%m%d)',
+    flags: [
+      { name: '--db-instance-identifier', desc: 'The RDS instance to snapshot' },
+      { name: '--db-snapshot-identifier', desc: 'Name for the snapshot — include date for easy sorting' },
+    ],
+    desc: 'Create a manual RDS snapshot with a dated name — safe to run before any DB migration or major deploy. Manual snapshots persist until you delete them, unlike automated ones.',
+    output: 'DBSnapshotIdentifier: prod-postgres-20260421\nStatus: creating',
+  },
+];
+
+// COTD state
+let cotdIndex = 0;
+
+function getCotdSeedIndex() {
+  // Date-seeded: same command all day, advances at midnight
+  const today = new Date();
+  const seed  = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return seed % COTD_COMMANDS.length;
+}
+
+function getCategoryClass(cat) {
+  const map = { linux:'cotd-linux', k8s:'cotd-k8s', terraform:'cotd-terraform', git:'cotd-git', cloud:'cotd-cloud' };
+  return map[cat] || 'cotd-linux';
+}
+
+function renderCotd(idx) {
+  const c   = COTD_COMMANDS[idx];
+  const cls = getCategoryClass(c.category);
+  const flagsHtml = c.flags.map(f =>
+    `<div class="cotd-flag-row">
+      <span class="cotd-flag-name">${f.name}</span>
+      <span class="cotd-flag-desc">${f.desc}</span>
+    </div>`
+  ).join('');
+  document.getElementById('cotd-content').innerHTML = `
+    <span class="cotd-category ${cls}">${c.label}</span>
+    <div class="cotd-command-wrap">
+      <div class="cotd-cmd-bar">
+        <span class="cotd-cmd-label">$ command</span>
+        <button class="cotd-copy-btn" onclick="copyCotd(this)">copy</button>
+      </div>
+      <div class="cotd-cmd-body">
+        <span class="cotd-prompt">$ </span><span class="cotd-cmd" id="cotd-cmd-text">${escHtml(c.cmd)}</span>
+        ${c.output ? `<span class="cotd-out">${escHtml(c.output)}</span>` : ''}
+      </div>
+    </div>
+    <p class="cotd-desc">${c.desc}</p>
+    ${c.flags.length ? `<div class="cotd-flags">${flagsHtml}</div>` : ''}
+    <div class="cotd-footer">
+      <span class="cotd-date">Command ${idx + 1} of ${COTD_COMMANDS.length}</span>
+      <button class="cotd-next-btn" onclick="nextCotd()">next →</button>
+    </div>`;
+  renderCotdDots(idx);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function renderCotdDots(active) {
+  // Show 5 dots representing the 5 categories, highlight active category dot
+  const cats = ['linux','k8s','terraform','git','cloud'];
+  const activeCat = COTD_COMMANDS[active].category;
+  document.getElementById('cotd-dots').innerHTML = cats.map(cat => {
+    const cls = getCategoryClass(cat);
+    // Get first command index in this category
+    const isActive = cat === activeCat;
+    return `<div class="cotd-dot ${isActive ? 'active' : ''}" onclick="jumpCotdCategory('${cat}')" title="${cat}"></div>`;
+  }).join('');
+}
+
+function nextCotd() {
+  cotdIndex = (cotdIndex + 1) % COTD_COMMANDS.length;
+  renderCotd(cotdIndex);
+}
+
+function jumpCotdCategory(cat) {
+  const idx = COTD_COMMANDS.findIndex(c => c.category === cat);
+  if (idx >= 0) { cotdIndex = idx; renderCotd(cotdIndex); }
+}
+
+function copyCotd(btn) {
+  const cmd = COTD_COMMANDS[cotdIndex].cmd;
+  navigator.clipboard?.writeText(cmd).then(() => {
+    btn.textContent = 'copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = 'copy'; btn.style.color = ''; }, 2000);
+  }).catch(() => showToast('Copy not supported in this browser', true));
+}
+
+function initCotd() {
+  cotdIndex = getCotdSeedIndex();
+  renderCotd(cotdIndex);
+}
+
 // ── Boot ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initBanner();
@@ -1908,6 +2738,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buildTrackerTabs();
   refreshTrackerUI();
   updateTrackerBtn();
+  initCotd();
 });
 </script>
 
