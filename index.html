@@ -1004,6 +1004,257 @@
 
     <div id="posts-grid">
 
+      <!-- POST: Linux Troubleshooting Playbook -->
+      <article class="post-card"
+        data-series="linux"
+        data-tags="linux troubleshooting playbook sre devops incident production debugging uptime journalctl lsof iostat"
+        data-date="2026-04-28"
+        data-title="My Linux Troubleshooting Playbook — 16 Steps from Any Production Incident"
+        data-prereqs="Basic Linux CLI,systemctl basics,sudo access"
+        data-order="1">
+        <div class="card-body">
+          <span class="post-series series-linux card-series">◈ Linux 100 · #01</span>
+          <div class="card-title">My Linux Troubleshooting Playbook — 16 Steps from Any Production Incident</div>
+          <div class="card-excerpt">Production systems fail. The gap between a 5-minute fix and a 3-hour war room is a structured approach. Here's the exact 16-step workflow I've used across 7 years of cloud ops — from load averages to tracing deleted files holding disk space hostage.</div>
+          <div class="card-snippet">
+            <div class="cs-bar">
+              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
+              <span class="cs-label">eknatha@prod-node-01 ~</span>
+              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
+            </div>
+            <div class="cs-body">
+              <div><span class="cs-prompt">$ </span><span class="cs-cmd">uptime</span></div>
+              <span class="cs-out">10:25:01 up 5 days,  load average: <span class="cs-hi">4.20</span>, 3.80, 2.10  ← spike!</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">journalctl -u app -f --since "10 min ago"</span></div>
+              <span class="cs-err">OOMKilled: process app-server (pid 4821) killed</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">lsof | grep deleted</span></div>
+              <span class="cs-out">java  1847  /var/log/app.log (deleted) <span class="cs-hi">27GB</span></span>
+              <span class="cs-ok">✓ root cause found — step 12 of the playbook</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="post-meta">
+              <span>Apr 28, 2026</span><span class="meta-sep">·</span>
+              <span class="read-time">7 min</span>
+            </div>
+          </div>
+          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#troubleshooting</span><span class="tag">#sre</span><span class="tag">#incident-response</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
+      </article>
+
+      <!-- POST: Log Analysis -->
+      <article class="post-card"
+        data-series="linux"
+        data-tags="linux logs journalctl grep awk log-analysis sre devops auth nginx"
+        data-date="2026-04-23"
+        data-title="Linux Log Analysis for DevOps: grep, awk, journalctl and What to Actually Look For"
+        data-prereqs="Basic bash,grep basics,systemd familiarity"
+        data-order="2">
+        <div class="card-body">
+          <span class="post-series series-linux card-series">◈ Linux 100 · #02</span>
+          <div class="card-title">Linux Log Analysis for DevOps: grep, awk, journalctl and What to Actually Look For</div>
+          <div class="card-excerpt">Logs are the single best source of truth in any incident — but only if you know where to look. Covers the real workflow: systemd journals, filtering failed auth attempts, extracting signal from noise with grep and awk, and tail patterns that actually tell you something.</div>
+          <div class="card-snippet">
+            <div class="cs-bar">
+              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
+              <span class="cs-label">eknatha@prod-node-01 ~</span>
+              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
+            </div>
+            <div class="cs-body">
+              <div><span class="cs-prompt">$ </span><span class="cs-cmd">grep "Failed password" /var/log/auth.log | wc -l</span></div>
+              <span class="cs-err">4821  ← brute force in progress</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">awk '{print $9}' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -5</span></div>
+              <span class="cs-out">  <span class="cs-hi">2043</span> 200   831 404   12 500</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">journalctl -u nginx --since "1 hour ago" -p err</span></div>
+              <span class="cs-ok">✓ filtered to errors only — 3 lines, root cause visible</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="post-meta">
+              <span>Apr 23, 2026</span><span class="meta-sep">·</span>
+              <span class="read-time">6 min</span>
+            </div>
+          </div>
+          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#logs</span><span class="tag">#grep</span><span class="tag">#awk</span><span class="tag">#journalctl</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
+      </article>
+
+      <!-- POST: System Monitoring -->
+      <article class="post-card"
+        data-series="linux"
+        data-tags="linux monitoring cpu memory disk io top htop vmstat iostat sar performance"
+        data-date="2026-04-17"
+        data-title="System Monitoring Deep Dive: What top Doesn't Tell You (and What Does)"
+        data-prereqs="Basic Linux CLI,top/htop usage,sudo access"
+        data-order="3">
+        <div class="card-body">
+          <span class="post-series series-linux card-series">◈ Linux 100 · #03</span>
+          <div class="card-title">System Monitoring Deep Dive: What top Doesn't Tell You (and What Does)</div>
+          <div class="card-excerpt">Everyone knows top. But when a server crawls and top shows nothing obvious, where do you look? This covers the full stack: CPU steal time, memory pressure vs swap usage, I/O wait, and the vmstat + iostat combo that actually tells you what's blocking your system.</div>
+          <div class="card-snippet">
+            <div class="cs-bar">
+              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
+              <span class="cs-label">eknatha@prod-node-02 ~</span>
+              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
+            </div>
+            <div class="cs-body">
+              <div><span class="cs-prompt">$ </span><span class="cs-cmd">vmstat 2 5</span></div>
+              <span class="cs-out">r  b   swpd   free   buff   cache   wa  st</span>
+              <span class="cs-err">4  8      0  12000   2000  400000  <span class="cs-hi">68</span>   0  ← wa=68% I/O wait!</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">iostat -x 2 | grep -v "^$"</span></div>
+              <span class="cs-out">sda   r/s: 0.0  w/s: <span class="cs-hi">842.0</span>  await: 180ms  ← saturated</span>
+              <span class="cs-ok">✓ disk write saturation — not CPU, not memory</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="post-meta">
+              <span>Apr 17, 2026</span><span class="meta-sep">·</span>
+              <span class="read-time">8 min</span>
+            </div>
+          </div>
+          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#monitoring</span><span class="tag">#performance</span><span class="tag">#iostat</span><span class="tag">#vmstat</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
+      </article>
+
+      <!-- POST: Networking Commands -->
+      <article class="post-card"
+        data-series="linux"
+        data-tags="linux networking ss lsof tcpdump netstat dns dig traceroute devops troubleshooting"
+        data-date="2026-04-10"
+        data-title="Linux Networking Commands I Actually Use in Production (Not Just ping)"
+        data-prereqs="Basic Linux CLI,TCP/IP basics,sudo access"
+        data-order="4">
+        <div class="card-body">
+          <span class="post-series series-linux card-series">◈ Linux 100 · #04</span>
+          <div class="card-title">Linux Networking Commands I Actually Use in Production (Not Just ping)</div>
+          <div class="card-excerpt">ping tells you a host is alive. But which process is holding port 8080? Why is DNS resolution slow only for this one service? Why is the connection established but no traffic flowing? Real production toolkit: ss, lsof -i, dig, tcpdump — with actual use cases for each.</div>
+          <div class="card-snippet">
+            <div class="cs-bar">
+              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
+              <span class="cs-label">eknatha@prod-node-01 ~</span>
+              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
+            </div>
+            <div class="cs-body">
+              <div><span class="cs-prompt">$ </span><span class="cs-cmd">ss -tulnp | grep 8080</span></div>
+              <span class="cs-out">tcp  LISTEN  0  128  *:8080  users:(("<span class="cs-hi">java</span>",pid=3241,fd=42))</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">dig +short api.internal @10.0.0.2</span></div>
+              <span class="cs-err">;; connection timed out  ← internal DNS down</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">tcpdump -i eth0 -n port 8080 -c 20</span></div>
+              <span class="cs-ok">✓ SYN_SENT but no SYN-ACK — firewall rule missing</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="post-meta">
+              <span>Apr 10, 2026</span><span class="meta-sep">·</span>
+              <span class="read-time">6 min</span>
+            </div>
+          </div>
+          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#networking</span><span class="tag">#ss</span><span class="tag">#tcpdump</span><span class="tag">#dns</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
+      </article>
+
+      <!-- POST: Process Management -->
+      <article class="post-card"
+        data-series="linux"
+        data-tags="linux processes ps kill signals zombie defunct strace pstree devops sre"
+        data-date="2026-04-03"
+        data-title="Linux Process Management: Signals, Zombies, and When kill -9 Is the Wrong Answer"
+        data-prereqs="Basic Linux CLI,process concepts,sudo access"
+        data-order="5">
+        <div class="card-body">
+          <span class="post-series series-linux card-series">◈ Linux 100 · #05</span>
+          <div class="card-title">Linux Process Management: Signals, Zombies, and When kill -9 Is the Wrong Answer</div>
+          <div class="card-excerpt">kill -9 is the nuclear option — it works, but skips cleanup handlers and can corrupt state. How Linux signals actually work, how to identify zombie processes, how to use strace to see what a hung process is doing, and the safe termination sequence every SRE should know.</div>
+          <div class="card-snippet">
+            <div class="cs-bar">
+              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
+              <span class="cs-label">eknatha@prod-node-03 ~</span>
+              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
+            </div>
+            <div class="cs-body">
+              <div><span class="cs-prompt">$ </span><span class="cs-cmd">ps aux | awk '$8=="Z" {print $2, $11}'</span></div>
+              <span class="cs-out"><span class="cs-hi">8 zombie processes</span> — all children of pid 1024</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">strace -p 1024 -e trace=wait4 2>&1 | head</span></div>
+              <span class="cs-err">strace: Process 1024 attached — blocked in wait()</span>
+              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">kill -15 1024 &amp;&amp; sleep 3 &amp;&amp; kill -9 1024</span></div>
+              <span class="cs-ok">✓ SIGTERM first, SIGKILL only if no response in 3s</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="post-meta">
+              <span>Apr 03, 2026</span><span class="meta-sep">·</span>
+              <span class="read-time">5 min</span>
+            </div>
+          </div>
+          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#processes</span><span class="tag">#signals</span><span class="tag">#strace</span><span class="tag">#debugging</span></div>
+          <div class="prereq-block">
+            <div class="prereq-toggle" onclick="togglePrereq(this)">
+              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
+            </div>
+            <div class="prereq-body">
+              <div class="prereq-pills"></div>
+              <p class="prereq-note">You should be comfortable running these before reading.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-right-col">
+          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
+          <div class="card-arrow" aria-hidden="true">→</div>
+        </div>
+      </article>
+
       <!-- ╔═══ NEW POST GOES HERE — paste above this line ═══╗ -->
 
       <!-- POST: TIF #01 — df vs du -->
