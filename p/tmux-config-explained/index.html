@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>My tmux Config — Split Panes, Session Persistence &amp; the One Plugin That Saved Me — EknathaLabs Blog</title>
+  <meta name="description" content="Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that survives a dropped SSH connection so you never lose a long-running job again.">
+  <meta name="author" content="Eknatha Reddy Puli">
+  <meta name="keywords" content="tmux, dotfiles, terminal">
+  <link rel="canonical" href="https://blog.eknathalabs.com/p/tmux-config-explained/">
+
+  <meta property="og:type"        content="article">
+  <meta property="og:url"         content="https://blog.eknathalabs.com/p/tmux-config-explained/">
+  <meta property="og:title"       content="My tmux Config — Split Panes, Session Persistence &amp; the One Plugin That Saved Me">
+  <meta property="og:description" content="Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that survives a dropped SSH connection so you never lose a long-running job again.">
+  <meta property="og:image"       content="https://blog.eknathalabs.com/og-image.png">
+  <meta property="article:published_time" content="2026-04-14">
+  <meta property="article:author"         content="Eknatha Reddy Puli">
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="My tmux Config — Split Panes, Session Persistence &amp; the One Plugin That Saved Me">
+  <meta name="twitter:description" content="Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that survives a dropped SSH connection so you never lose a long-running job again.">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"My tmux Config — Split Panes, Session Persistence & the One Plugin That Saved Me","description":"Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that survives a dropped SSH connection so you never lose a long-running job again.","datePublished":"2026-04-14","dateModified":"2026-04-14","author":{"@type":"Person","name":"Eknatha Reddy Puli"},"publisher":{"@type":"Organization","name":"EknathaLabs"},"mainEntityOfPage":"https://blog.eknathalabs.com/p/tmux-config-explained/","keywords":"tmux, dotfiles, terminal"}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link href="/assets/fonts/fonts.css" rel="stylesheet" onerror="this.remove()">
+
+  <style>
+    :root {
+      --bg:#080b0f; --bg2:#0d1117; --surface:#111820; --surface2:#131c28;
+      --border:#1c2333; --border-hi:#2a3a52; --text:#dce4f0; --muted:#6a7a96;
+      --dim:#3d4f6a; --green:#00e5a0; --green-dim:rgba(0,229,160,0.08);
+      --green-glow:rgba(0,229,160,0.18); --amber:#f5a623; --red:#f05454; --blue:#4a9eff;
+      --serif:'Playfair Display',Georgia,serif; --mono:'IBM Plex Mono','Courier New',monospace;
+      --sans:'DM Sans',sans-serif; --r:10px; --t:0.18s ease;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.75;overflow-x:hidden;min-height:100vh}
+    body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:0}
+    a{color:var(--green);text-decoration:none}
+    a:hover{text-decoration:underline}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:3px}
+
+    /* top reading progress bar */
+    #progress-bar{position:fixed;top:0;left:0;z-index:500;height:2px;width:0%;background:linear-gradient(90deg,var(--green),#00a0ff);transition:width .1s linear}
+
+    /* nav */
+    .nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(8,11,15,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-brand{font-family:var(--mono);font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px}
+    .nav-brand b{color:var(--green)}
+    .nav-links{display:flex;gap:18px;font-family:var(--mono);font-size:12px}
+    .nav-links a{color:var(--muted)}
+    .nav-links a:hover{color:var(--green);text-decoration:none}
+
+    /* floating read ring — the SIGNATURE element, now scroll-driven */
+    .read-ring-float{position:fixed;bottom:24px;right:24px;z-index:200;width:64px;height:64px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--surface);border:1px solid var(--border-hi);border-radius:50%;box-shadow:0 8px 28px rgba(0,0,0,.5);transition:transform var(--t),border-color var(--t)}
+    .read-ring-float:hover{transform:scale(1.06);border-color:var(--green)}
+    .read-ring-float svg{position:absolute;inset:0;transform:rotate(-90deg)}
+    .rrf-bg{fill:none;stroke:var(--border);stroke-width:3}
+    .rrf-fg{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .15s linear}
+    .read-ring-float.done .rrf-fg{stroke:var(--green);filter:drop-shadow(0 0 4px var(--green-glow))}
+    .rrf-label{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);z-index:1}
+    .read-ring-float.done .rrf-label{color:var(--green);font-size:20px}
+    .rrf-hint{position:absolute;bottom:72px;right:0;white-space:nowrap;font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;opacity:0;transform:translateY(4px);transition:all var(--t);pointer-events:none}
+    .read-ring-float:hover .rrf-hint{opacity:1;transform:translateY(0)}
+
+    /* article */
+    .wrap{max-width:760px;margin:0 auto;padding:48px 24px 80px;position:relative;z-index:1}
+    .back{font-family:var(--mono);font-size:12px;color:var(--muted);display:inline-block;margin-bottom:28px}
+    .back:hover{color:var(--green);text-decoration:none}
+    .post-series{display:inline-block;font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:6px;margin-bottom:18px;border:1px solid var(--border-hi)}
+    .series-linux{color:var(--green);background:var(--green-dim)}
+    .series-k8s{color:var(--blue);background:rgba(74,158,255,.08)}
+    .series-pe{color:var(--amber);background:rgba(245,166,35,.08)}
+    .series-dotfiles{color:#ff8fc7;background:rgba(255,143,199,.08)}
+    .series-tif{color:#3ee9b0;background:rgba(62,233,176,.08)}
+    .series-tips{color:#b794f6;background:rgba(183,148,246,.08)}
+    h1.post-title{font-family:var(--serif);font-weight:900;font-size:clamp(1.9rem,5vw,3rem);line-height:1.12;letter-spacing:-.01em;margin-bottom:18px}
+    h1.post-title em{font-style:italic;color:var(--green)}
+    .post-meta{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:22px}
+    .meta-sep{color:var(--dim)}
+    .prereq-strip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:34px}
+    .ps-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-right:4px}
+    .prereq-pill{font-family:var(--mono);font-size:11px;color:var(--text);background:var(--surface2);border:1px solid var(--border-hi);border-radius:20px;padding:3px 11px}
+
+    /* article body typography */
+    .post-body{font-size:1.02rem}
+    .post-body h2{font-family:var(--serif);font-weight:700;font-size:1.6rem;margin:42px 0 14px;line-height:1.25}
+    .post-body h3{font-family:var(--serif);font-weight:700;font-size:1.25rem;margin:32px 0 12px}
+    .post-body h4{font-family:var(--mono);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:26px 0 10px}
+    .post-body p{margin:0 0 18px}
+    .post-body ul,.post-body ol{margin:0 0 18px;padding-left:24px}
+    .post-body li{margin-bottom:7px}
+    .post-body strong{color:#fff;font-weight:600}
+    .post-body a{color:var(--green);border-bottom:1px solid var(--green-dim)}
+    .post-body code{font-family:var(--mono);font-size:.85em;color:var(--green);background:var(--green-dim);border:1px solid var(--border);border-radius:5px;padding:1px 6px}
+    .post-body blockquote{border-left:3px solid var(--green);background:var(--surface);padding:14px 18px;margin:0 0 22px;border-radius:0 var(--r) var(--r) 0;color:var(--text);font-style:italic}
+    .post-body blockquote code{font-style:normal}
+    .post-body hr{border:none;border-top:1px solid var(--border);margin:36px 0}
+    .post-body table{width:100%;border-collapse:collapse;font-size:.9rem;margin:0 0 24px;font-family:var(--sans)}
+    .post-body th,.post-body td{border:1px solid var(--border);padding:9px 12px;text-align:left}
+    .post-body th{background:var(--surface);font-family:var(--mono);font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .post-body td code{font-size:.82em}
+
+    /* terminal snippet (reused from homepage card aesthetic) */
+    .post-snippet{background:var(--bg2);border:1px solid var(--border-hi);border-radius:var(--r);overflow:hidden;margin:0 0 24px;font-family:var(--mono);font-size:13px}
+    .cs-bar{display:flex;align-items:center;gap:7px;padding:9px 13px;background:var(--surface);border-bottom:1px solid var(--border)}
+    .cs-dot{width:10px;height:10px;border-radius:50%}
+    .cs-dot.r{background:#f05454}.cs-dot.y{background:#f5a623}.cs-dot.g{background:#00e5a0}
+    .cs-label{font-size:11px;color:var(--muted);margin-left:4px}
+    .cs-copy{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);border-radius:5px;padding:3px 9px;cursor:pointer;transition:all var(--t)}
+    .cs-copy:hover{color:var(--green);border-color:var(--green)}
+    .cs-body{padding:13px 15px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+    .cs-prompt{color:var(--green)}
+    .cs-cmd{color:var(--text)}
+    .cs-out{color:var(--muted);display:block}
+    .post-snippet.plain pre{margin:0}
+    .post-snippet.plain code{background:none;border:none;color:var(--text);padding:0;font-size:13px}
+
+    /* prev/next */
+    .post-nav{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:54px;padding-top:30px;border-top:1px solid var(--border)}
+    .pn{display:flex;flex-direction:column;gap:5px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);transition:all var(--t)}
+    .pn:hover{border-color:var(--border-hi);background:var(--surface2);text-decoration:none}
+    .pn.next{text-align:right}
+    .pn.empty{background:none;border:none}
+    .pn-dir{font-family:var(--mono);font-size:11px;color:var(--muted)}
+    .pn-title{font-family:var(--serif);font-size:.95rem;color:var(--text)}
+
+    .post-foot{margin-top:40px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--dim)}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r);padding:12px 20px;font-family:var(--mono);font-size:13px;display:flex;align-items:center;gap:9px;z-index:600;opacity:0;transition:all .3s ease;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    @media(max-width:600px){
+      .post-nav{grid-template-columns:1fr}
+      .pn.next{text-align:left}
+      .nav-links a:not(:last-child){display:none}
+      .read-ring-float{width:56px;height:56px;bottom:16px;right:16px}
+    }
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+
+  <nav class="nav">
+    <a class="nav-brand" href="/"><b>E</b> EknathaLabs/blog</a>
+    <div class="nav-links">
+      <a href="https://eknathalabs.com">Home</a>
+      <a href="https://labs.eknathalabs.com">Labs</a>
+      <a href="https://learn.eknathalabs.com">Learn</a>
+      <a href="/#newsletter">Subscribe</a>
+    </div>
+  </nav>
+
+  <!-- SIGNATURE: scroll-depth reading ring. Fills as you read; click to
+       lock as complete. Persists real progress to localStorage. -->
+  <div class="read-ring-float" id="read-ring" onclick="toggleComplete()" title="Reading progress">
+    <svg width="64" height="64" viewBox="0 0 64 64">
+      <circle class="rrf-bg" cx="32" cy="32" r="28"/>
+      <circle class="rrf-fg" id="rrf-fg" cx="32" cy="32" r="28"/>
+    </svg>
+    <span class="rrf-label" id="rrf-label">0%</span>
+    <span class="rrf-hint" id="rrf-hint">scroll to read · click to mark done</span>
+  </div>
+
+  <main class="wrap">
+    <a class="back" href="/">← all posts</a>
+    <span class="post-series series-dotfiles">⚙ Dotfiles · #02</span>
+    <h1 class="post-title">My tmux Config — Split Panes, Session Persistence &amp; the One Plugin That Saved Me</h1>
+    <div class="post-meta">
+      <span>Apr 14, 2026</span><span class="meta-sep">·</span>
+      <span>7 min read</span><span class="meta-sep">·</span>
+      <span><span class="tag">#tmux</span><span class="tag">#dotfiles</span><span class="tag">#terminal</span></span>
+    </div>
+    <div class="prereq-strip"><span class="ps-label">Prerequisites</span><span class="prereq-pill">tmux installed</span><span class="prereq-pill">Basic terminal usage</span><span class="prereq-pill">Read .bashrc post first</span></div>
+
+    <article class="post-body" id="post-body">
+<p>tmux is the difference between losing a 40-minute migration to a dropped SSH session and not caring that your laptop slept. Here&#39;s the config that runs every day.</p>
+<h2>A saner prefix and instant reload</h2>
+<div class="post-snippet plain"><div class="cs-bar"><span class="cs-label">bash</span><button class="cs-copy" onclick="copyCode(this)">copy</button></div><pre class="cs-body"><code># ~/.tmux.conf
+unbind C-b
+set -g prefix C-a          # easier to reach than C-b
+bind r source-file ~/.tmux.conf \; display &quot;reloaded&quot;</code></pre></div>
+<p><code>C-a</code> as prefix is reachable without contorting your hand. <code>prefix r</code> reloads the config without restarting the server.</p>
+<h2>The layout I open for every incident</h2>
+<div class="post-snippet plain"><div class="cs-bar"><span class="cs-label">bash</span><button class="cs-copy" onclick="copyCode(this)">copy</button></div><pre class="cs-body"><code>bind L split-window -h \; split-window -v \; select-pane -L</code></pre></div>
+<p>One keystroke gives me a three-pane layout: big shell on the left, logs top-right (<code>journalctl -f</code>), metrics bottom-right (<code>watch kubectl top pods</code>). Everything I need to watch an incident, in one window.</p>
+<h2>Named sessions per cluster</h2>
+<div class="post-snippet"><div class="cs-bar"><span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span><span class="cs-label">eknatha@prod ~</span><button class="cs-copy" onclick="copyCode(this)">copy</button></div><div class="cs-body"><div><span class="cs-prompt">$ </span><span class="cs-cmd">tmux new -s prod-eu</span></div><div><span class="cs-prompt">$ </span><span class="cs-cmd">tmux new -s staging</span></div><div><span class="cs-prompt">$ </span><span class="cs-cmd">tmux attach -t prod-eu</span></div></div></div>
+<p>Naming sessions after clusters means I never fat-finger a command into the wrong environment — the session name is right there in the status bar.</p>
+<h2>The one plugin: tmux-resurrect</h2>
+<div class="post-snippet plain"><div class="cs-bar"><span class="cs-label">bash</span><button class="cs-copy" onclick="copyCode(this)">copy</button></div><pre class="cs-body"><code># in .tmux.conf, via TPM
+set -g @plugin &#39;tmux-plugins/tmux-resurrect&#39;
+set -g @plugin &#39;tmux-plugins/tmux-continuum&#39;
+set -g @continuum-restore &#39;on&#39;</code></pre></div>
+<p><strong>tmux-resurrect</strong> saves your entire session layout — windows, panes, working directories, even running programs — to disk. <strong>tmux-continuum</strong> auto-saves every 15 minutes and restores on server start. A reboot no longer means rebuilding six windows of context by hand.</p>
+<blockquote>A dropped connection should cost you nothing. tmux + resurrect is how you make that true.</blockquote>
+    </article>
+
+    <nav class="post-nav">
+      <a class="pn prev" href="/p/linux-networking-commands-production/"><span class="pn-dir">← older</span><span class="pn-title">Linux Networking Commands I Actually Use in Production (Not Just ping)</span></a>
+      <a class="pn next" href="/p/find-files-modified-24h-fleet/"><span class="pn-dir">newer →</span><span class="pn-title">Find All Files Modified in Last 24 Hours Across a Fleet</span></a></nav>
+    <div class="post-foot">// written from production experience — by Eknatha</div>
+  </main>
+
+  <div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+  <script>
+    const SLUG = 'tmux-config-explained';
+    const KEY  = 'read::' + SLUG;          // per-post progress (0–100)
+    const R = 28, C = 2 * Math.PI * R;
+    const fg = document.getElementById('rrf-fg');
+    const label = document.getElementById('rrf-label');
+    const ring  = document.getElementById('read-ring');
+    fg.style.strokeDasharray = C;
+
+    let stored = 0, locked = false;
+    try {
+      const v = parseInt(localStorage.getItem(KEY));
+      if (!isNaN(v)) { stored = v; locked = v >= 100; }
+    } catch(e){}
+
+    function paint(pct, done){
+      pct = Math.max(0, Math.min(100, Math.round(pct)));
+      fg.style.strokeDashoffset = C - (C * pct / 100);
+      if (done){ ring.classList.add('done'); label.textContent = '✓'; }
+      else { ring.classList.remove('done'); label.textContent = pct + '%'; }
+    }
+
+    // ── FRACTIONAL progress: driven by scroll depth through the article ──
+    const bodyEl = document.getElementById('post-body');
+    function scrollPct(){
+      const rect = bodyEl.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const total = bodyEl.offsetHeight - vh * 0.4;
+      const passed = vh * 0.6 - rect.top;        // 60% down viewport = "reading line"
+      return total <= 0 ? 100 : (passed / total) * 100;
+    }
+
+    function onScroll(){
+      const el = document.documentElement;
+      document.getElementById('progress-bar').style.width =
+        Math.min((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100, 100) + '%';
+      if (locked) return;
+      const pct = scrollPct();
+      if (pct > stored){
+        stored = pct;
+        try { localStorage.setItem(KEY, Math.round(pct >= 98 ? 100 : pct)); } catch(e){}
+        if (pct >= 98){ locked = true; paint(100, true); flash('✓ Finished — marked read'); return; }
+      }
+      paint(Math.max(stored, pct), false);
+    }
+
+    function toggleComplete(){
+      locked = !locked;
+      stored = locked ? 100 : Math.round(scrollPct());
+      try { localStorage.setItem(KEY, stored); } catch(e){}
+      paint(stored, locked);
+      flash(locked ? '✓ Marked as read' : 'Marked as unread');
+    }
+
+    function flash(msg){
+      const t = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      t.classList.add('show'); clearTimeout(t._t);
+      t._t = setTimeout(()=>t.classList.remove('show'), 2600);
+    }
+
+    function copyCode(btn){
+      const body = btn.closest('.post-snippet').querySelector('.cs-body');
+      const text = body.innerText.replace(/^\$ /gm,'').trim();
+      navigator.clipboard?.writeText(text).then(()=>{
+        btn.textContent='copied!'; btn.style.color='var(--green)';
+        setTimeout(()=>{btn.textContent='copy';btn.style.color='';},1800);
+      });
+    }
+
+    let ticking=false;
+    window.addEventListener('scroll', ()=>{ if(!ticking){requestAnimationFrame(()=>{onScroll();ticking=false});ticking=true} }, {passive:true});
+    paint(stored, locked);
+    onScroll();
+  </script>
+</body>
+</html>

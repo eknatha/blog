@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+  <title>EknathaLabs Blog</title>
+  <link>https://blog.eknathalabs.com/</link>
+  <description>Real DevOps. Real Fixes. No Fluff.</description>
+  <language>en-us</language>
+    <item>
+      <title>My Linux Troubleshooting Playbook — 16 Steps from Any Production Incident</title>
+      <link>https://blog.eknathalabs.com/p/linux-troubleshooting-playbook/</link>
+      <guid>https://blog.eknathalabs.com/p/linux-troubleshooting-playbook/</guid>
+      <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
+      <description>Production systems fail. The gap between a 5-minute fix and a 3-hour war room is a structured approach. Here&#39;s the exact 16-step workflow I&#39;ve used across 7 years of cloud ops — from load averages to tracing deleted files holding disk space hostage.</description>
+    </item>
+    <item>
+      <title>Linux Log Analysis for DevOps: grep, awk, journalctl and What to Actually Look For</title>
+      <link>https://blog.eknathalabs.com/p/linux-log-analysis-grep-awk-journalctl/</link>
+      <guid>https://blog.eknathalabs.com/p/linux-log-analysis-grep-awk-journalctl/</guid>
+      <pubDate>Thu, 23 Apr 2026 00:00:00 GMT</pubDate>
+      <description>Logs are the single best source of truth in any incident — but only if you know where to look. Covers the real workflow: systemd journals, filtering failed auth attempts, extracting signal from noise with grep and awk, and tail patterns that actually tell you something.</description>
+    </item>
+    <item>
+      <title>TIF #01 — df Shows 100% But du Disagrees</title>
+      <link>https://blog.eknathalabs.com/p/tif-df-shows-100-but-du-disagrees/</link>
+      <guid>https://blog.eknathalabs.com/p/tif-df-shows-100-but-du-disagrees/</guid>
+      <pubDate>Tue, 21 Apr 2026 00:00:00 GMT</pubDate>
+      <description>Deleted log files held open by a running process. The space won&#39;t free until the file handle closes — here&#39;s the one-liner that finds the culprit.</description>
+    </item>
+    <item>
+      <title>My .bashrc, .vimrc &amp; Aliases — Every Line Explained</title>
+      <link>https://blog.eknathalabs.com/p/bashrc-vimrc-aliases-explained/</link>
+      <guid>https://blog.eknathalabs.com/p/bashrc-vimrc-aliases-explained/</guid>
+      <pubDate>Sun, 19 Apr 2026 00:00:00 GMT</pubDate>
+      <description>13+ years of ops muscle memory, written down. Prompt tuning, kubectl shortcuts, SSH multiplexing, and the aliases that have saved me thousands of keystrokes.</description>
+    </item>
+    <item>
+      <title>CrashLoopBackOff at 3 AM — How I Traced It in 8 Minutes</title>
+      <link>https://blog.eknathalabs.com/p/crashloopbackoff-3am/</link>
+      <guid>https://blog.eknathalabs.com/p/crashloopbackoff-3am/</guid>
+      <pubDate>Sat, 18 Apr 2026 00:00:00 GMT</pubDate>
+      <description>A payment service was restarting every 90 seconds. No alerts fired on the actual root cause. Here&#39;s the exact kubectl sequence that exposed a silent selector mismatch — and why this pattern will happen again.</description>
+    </item>
+    <item>
+      <title>System Monitoring Deep Dive: What top Doesn&#39;t Tell You (and What Does)</title>
+      <link>https://blog.eknathalabs.com/p/system-monitoring-deep-dive/</link>
+      <guid>https://blog.eknathalabs.com/p/system-monitoring-deep-dive/</guid>
+      <pubDate>Fri, 17 Apr 2026 00:00:00 GMT</pubDate>
+      <description>Everyone knows top. But when a server crawls and top shows nothing obvious, where do you look? This covers the full stack: CPU steal time, memory pressure vs swap usage, I/O wait, and the vmstat + iostat combo that actually tells you what&#39;s blocking your system.</description>
+    </item>
+    <item>
+      <title>Find All Files Modified in Last 24 Hours Across a Fleet</title>
+      <link>https://blog.eknathalabs.com/p/find-files-modified-24h-fleet/</link>
+      <guid>https://blog.eknathalabs.com/p/find-files-modified-24h-fleet/</guid>
+      <pubDate>Wed, 15 Apr 2026 00:00:00 GMT</pubDate>
+      <description>Using find -mtime to audit changes across a fleet of nodes — and how to safely exclude virtual filesystems so you don&#39;t drown in /proc noise.</description>
+    </item>
+    <item>
+      <title>My tmux Config — Split Panes, Session Persistence &amp; the One Plugin That Saved Me</title>
+      <link>https://blog.eknathalabs.com/p/tmux-config-explained/</link>
+      <guid>https://blog.eknathalabs.com/p/tmux-config-explained/</guid>
+      <pubDate>Tue, 14 Apr 2026 00:00:00 GMT</pubDate>
+      <description>Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that survives a dropped SSH connection so you never lose a long-running job again.</description>
+    </item>
+    <item>
+      <title>Linux Networking Commands I Actually Use in Production (Not Just ping)</title>
+      <link>https://blog.eknathalabs.com/p/linux-networking-commands-production/</link>
+      <guid>https://blog.eknathalabs.com/p/linux-networking-commands-production/</guid>
+      <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
+      <description>ping tells you a host is alive. But which process is holding port 8080? Why is DNS resolution slow only for this one service? Why is the connection established but no traffic flowing? Real production toolkit: ss, lsof -i, dig, tcpdump — with actual use cases for each.</description>
+    </item>
+    <item>
+      <title>Pod Stuck in Terminating — 4 Root Causes and How to Fix Each</title>
+      <link>https://blog.eknathalabs.com/p/pod-stuck-terminating-4-causes/</link>
+      <guid>https://blog.eknathalabs.com/p/pod-stuck-terminating-4-causes/</guid>
+      <pubDate>Sun, 05 Apr 2026 00:00:00 GMT</pubDate>
+      <description>Finalizers, PVCs, network policies, and webhook timeouts. Four reasons a pod won&#39;t die — and the right fix for each, instead of reaching for --force.</description>
+    </item>
+    <item>
+      <title>Linux Process Management: Signals, Zombies, and When kill -9 Is the Wrong Answer</title>
+      <link>https://blog.eknathalabs.com/p/linux-process-management-signals-zombies/</link>
+      <guid>https://blog.eknathalabs.com/p/linux-process-management-signals-zombies/</guid>
+      <pubDate>Fri, 03 Apr 2026 00:00:00 GMT</pubDate>
+      <description>kill -9 is the nuclear option — it works, but skips cleanup handlers and can corrupt state. How Linux signals actually work, how to identify zombie processes, how to use strace to see what a hung process is doing, and the safe order of escalation.</description>
+    </item>
+    <item>
+      <title>Parse a 100K-Line Log File Without Loading It Into Memory</title>
+      <link>https://blog.eknathalabs.com/p/parse-100k-line-log-without-loading/</link>
+      <guid>https://blog.eknathalabs.com/p/parse-100k-line-log-without-loading/</guid>
+      <pubDate>Mon, 30 Mar 2026 00:00:00 GMT</pubDate>
+      <description>awk streams line by line in constant memory — safe to run on a 10GB log on a live production server without OOMing the box.</description>
+    </item>
+    <item>
+      <title>rsync vs scp — Which One and When</title>
+      <link>https://blog.eknathalabs.com/p/rsync-vs-scp-which-and-when/</link>
+      <guid>https://blog.eknathalabs.com/p/rsync-vs-scp-which-and-when/</guid>
+      <pubDate>Wed, 25 Mar 2026 00:00:00 GMT</pubDate>
+      <description>rsync wins on resumable transfers and delta sync. scp wins on clean one-liners. Here&#39;s the quick decision rule so you stop guessing.</description>
+    </item>
+    <item>
+      <title>CKA Prep After 7+ Years of Cloud Ops — What Surprised Me</title>
+      <link>https://blog.eknathalabs.com/p/cka-prep-after-7-years-cloud-ops/</link>
+      <guid>https://blog.eknathalabs.com/p/cka-prep-after-7-years-cloud-ops/</guid>
+      <pubDate>Fri, 20 Mar 2026 00:00:00 GMT</pubDate>
+      <description>The exam isn&#39;t hard if you know Kubernetes. Except I thought I knew Kubernetes. Week 1 notes from someone with years of cloud ops who still got humbled by the CKA.</description>
+    </item>
+</channel></rss>

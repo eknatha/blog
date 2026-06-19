@@ -1,0 +1,318 @@
+[
+  {
+    "slug": "linux-troubleshooting-playbook",
+    "title": "My Linux Troubleshooting Playbook — 16 Steps from Any Production Incident",
+    "series": "linux",
+    "seriesNo": "01",
+    "date": "2026-04-28",
+    "excerpt": "Production systems fail. The gap between a 5-minute fix and a 3-hour war room is a structured approach. Here's the exact 16-step workflow I've used across 7 years of cloud ops — from load averages to tracing deleted files holding disk space hostage.",
+    "tags": [
+      "linux",
+      "troubleshooting",
+      "sre",
+      "incident-response"
+    ],
+    "prereqs": [
+      "Basic Linux CLI",
+      "systemctl basics",
+      "sudo access"
+    ],
+    "featured": false,
+    "readTime": "7 min",
+    "order": 0,
+    "url": "/p/linux-troubleshooting-playbook/"
+  },
+  {
+    "slug": "linux-log-analysis-grep-awk-journalctl",
+    "title": "Linux Log Analysis for DevOps: grep, awk, journalctl and What to Actually Look For",
+    "series": "linux",
+    "seriesNo": "02",
+    "date": "2026-04-23",
+    "excerpt": "Logs are the single best source of truth in any incident — but only if you know where to look. Covers the real workflow: systemd journals, filtering failed auth attempts, extracting signal from noise with grep and awk, and tail patterns that actually tell you something.",
+    "tags": [
+      "linux",
+      "logs",
+      "grep",
+      "awk",
+      "journalctl"
+    ],
+    "prereqs": [
+      "Basic bash",
+      "grep basics",
+      "systemd familiarity"
+    ],
+    "featured": false,
+    "readTime": "6 min",
+    "order": 0,
+    "url": "/p/linux-log-analysis-grep-awk-journalctl/"
+  },
+  {
+    "slug": "tif-df-shows-100-but-du-disagrees",
+    "title": "TIF #01 — df Shows 100% But du Disagrees",
+    "series": "tif",
+    "seriesNo": "01",
+    "date": "2026-04-21",
+    "excerpt": "Deleted log files held open by a running process. The space won't free until the file handle closes — here's the one-liner that finds the culprit.",
+    "tags": [
+      "linux",
+      "storage",
+      "lsof"
+    ],
+    "prereqs": [
+      "Basic Linux CLI",
+      "df/du commands",
+      "Root or sudo access"
+    ],
+    "featured": false,
+    "readTime": "2 min",
+    "order": 0,
+    "url": "/p/tif-df-shows-100-but-du-disagrees/"
+  },
+  {
+    "slug": "bashrc-vimrc-aliases-explained",
+    "title": "My .bashrc, .vimrc & Aliases — Every Line Explained",
+    "series": "dotfiles",
+    "seriesNo": "01",
+    "date": "2026-04-19",
+    "excerpt": "13+ years of ops muscle memory, written down. Prompt tuning, kubectl shortcuts, SSH multiplexing, and the aliases that have saved me thousands of keystrokes.",
+    "tags": [
+      "dotfiles",
+      "bash",
+      "productivity"
+    ],
+    "prereqs": [
+      "Basic bash usage",
+      "vim basics",
+      "SSH key setup"
+    ],
+    "featured": false,
+    "readTime": "11 min",
+    "order": 0,
+    "url": "/p/bashrc-vimrc-aliases-explained/"
+  },
+  {
+    "slug": "crashloopbackoff-3am",
+    "title": "CrashLoopBackOff at 3 AM — How I Traced It in 8 Minutes",
+    "series": "k8s",
+    "seriesNo": "01",
+    "date": "2026-04-18",
+    "excerpt": "A payment service was restarting every 90 seconds. No alerts fired on the actual root cause. Here's the exact kubectl sequence that exposed a silent selector mismatch — and why this pattern will happen again.",
+    "tags": [
+      "kubernetes",
+      "debugging",
+      "production"
+    ],
+    "prereqs": [
+      "kubectl basics",
+      "Kubernetes cluster access",
+      "Service/Endpoint concepts"
+    ],
+    "featured": true,
+    "readTime": "7 min",
+    "order": 0,
+    "url": "/p/crashloopbackoff-3am/"
+  },
+  {
+    "slug": "system-monitoring-deep-dive",
+    "title": "System Monitoring Deep Dive: What top Doesn't Tell You (and What Does)",
+    "series": "linux",
+    "seriesNo": "03",
+    "date": "2026-04-17",
+    "excerpt": "Everyone knows top. But when a server crawls and top shows nothing obvious, where do you look? This covers the full stack: CPU steal time, memory pressure vs swap usage, I/O wait, and the vmstat + iostat combo that actually tells you what's blocking your system.",
+    "tags": [
+      "linux",
+      "monitoring",
+      "performance",
+      "iostat",
+      "vmstat"
+    ],
+    "prereqs": [
+      "Basic Linux CLI",
+      "top/htop usage",
+      "sudo access"
+    ],
+    "featured": false,
+    "readTime": "8 min",
+    "order": 0,
+    "url": "/p/system-monitoring-deep-dive/"
+  },
+  {
+    "slug": "find-files-modified-24h-fleet",
+    "title": "Find All Files Modified in Last 24 Hours Across a Fleet",
+    "series": "linux",
+    "seriesNo": "12",
+    "date": "2026-04-15",
+    "excerpt": "Using find -mtime to audit changes across a fleet of nodes — and how to safely exclude virtual filesystems so you don't drown in /proc noise.",
+    "tags": [
+      "linux",
+      "find",
+      "fleet"
+    ],
+    "prereqs": [
+      "find command basics",
+      "SSH access to nodes",
+      "Basic shell scripting"
+    ],
+    "featured": false,
+    "readTime": "5 min",
+    "order": 0,
+    "url": "/p/find-files-modified-24h-fleet/"
+  },
+  {
+    "slug": "tmux-config-explained",
+    "title": "My tmux Config — Split Panes, Session Persistence & the One Plugin That Saved Me",
+    "series": "dotfiles",
+    "seriesNo": "02",
+    "date": "2026-04-14",
+    "excerpt": "Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that survives a dropped SSH connection so you never lose a long-running job again.",
+    "tags": [
+      "tmux",
+      "dotfiles",
+      "terminal"
+    ],
+    "prereqs": [
+      "tmux installed",
+      "Basic terminal usage",
+      "Read .bashrc post first"
+    ],
+    "featured": false,
+    "readTime": "7 min",
+    "order": 0,
+    "url": "/p/tmux-config-explained/"
+  },
+  {
+    "slug": "linux-networking-commands-production",
+    "title": "Linux Networking Commands I Actually Use in Production (Not Just ping)",
+    "series": "linux",
+    "seriesNo": "04",
+    "date": "2026-04-10",
+    "excerpt": "ping tells you a host is alive. But which process is holding port 8080? Why is DNS resolution slow only for this one service? Why is the connection established but no traffic flowing? Real production toolkit: ss, lsof -i, dig, tcpdump — with actual use cases for each.",
+    "tags": [
+      "linux",
+      "networking",
+      "ss",
+      "tcpdump",
+      "dns"
+    ],
+    "prereqs": [
+      "Basic Linux CLI",
+      "TCP/IP basics",
+      "sudo access"
+    ],
+    "featured": false,
+    "readTime": "6 min",
+    "order": 0,
+    "url": "/p/linux-networking-commands-production/"
+  },
+  {
+    "slug": "pod-stuck-terminating-4-causes",
+    "title": "Pod Stuck in Terminating — 4 Root Causes and How to Fix Each",
+    "series": "k8s",
+    "seriesNo": "02",
+    "date": "2026-04-05",
+    "excerpt": "Finalizers, PVCs, network policies, and webhook timeouts. Four reasons a pod won't die — and the right fix for each, instead of reaching for --force.",
+    "tags": [
+      "kubernetes",
+      "debugging",
+      "finalizers"
+    ],
+    "prereqs": [
+      "kubectl basics",
+      "Kubernetes cluster access",
+      "Basic understanding of Pods"
+    ],
+    "featured": false,
+    "readTime": "6 min",
+    "order": 0,
+    "url": "/p/pod-stuck-terminating-4-causes/"
+  },
+  {
+    "slug": "linux-process-management-signals-zombies",
+    "title": "Linux Process Management: Signals, Zombies, and When kill -9 Is the Wrong Answer",
+    "series": "linux",
+    "seriesNo": "05",
+    "date": "2026-04-03",
+    "excerpt": "kill -9 is the nuclear option — it works, but skips cleanup handlers and can corrupt state. How Linux signals actually work, how to identify zombie processes, how to use strace to see what a hung process is doing, and the safe order of escalation.",
+    "tags": [
+      "linux",
+      "processes",
+      "signals",
+      "strace",
+      "debugging"
+    ],
+    "prereqs": [
+      "Basic Linux CLI",
+      "process concepts",
+      "sudo access"
+    ],
+    "featured": false,
+    "readTime": "5 min",
+    "order": 0,
+    "url": "/p/linux-process-management-signals-zombies/"
+  },
+  {
+    "slug": "parse-100k-line-log-without-loading",
+    "title": "Parse a 100K-Line Log File Without Loading It Into Memory",
+    "series": "linux",
+    "seriesNo": "08",
+    "date": "2026-03-30",
+    "excerpt": "awk streams line by line in constant memory — safe to run on a 10GB log on a live production server without OOMing the box.",
+    "tags": [
+      "linux",
+      "awk",
+      "logs"
+    ],
+    "prereqs": [
+      "grep and awk basics",
+      "Access to log files",
+      "Basic piping in bash"
+    ],
+    "featured": false,
+    "readTime": "4 min",
+    "order": 0,
+    "url": "/p/parse-100k-line-log-without-loading/"
+  },
+  {
+    "slug": "rsync-vs-scp-which-and-when",
+    "title": "rsync vs scp — Which One and When",
+    "series": "tips",
+    "seriesNo": "01",
+    "date": "2026-03-25",
+    "excerpt": "rsync wins on resumable transfers and delta sync. scp wins on clean one-liners. Here's the quick decision rule so you stop guessing.",
+    "tags": [
+      "rsync",
+      "scp",
+      "linux"
+    ],
+    "prereqs": [
+      "Basic Linux CLI",
+      "SSH access"
+    ],
+    "featured": false,
+    "readTime": "3 min",
+    "order": 0,
+    "url": "/p/rsync-vs-scp-which-and-when/"
+  },
+  {
+    "slug": "cka-prep-after-7-years-cloud-ops",
+    "title": "CKA Prep After 7+ Years of Cloud Ops — What Surprised Me",
+    "series": "pe",
+    "seriesNo": "02",
+    "date": "2026-03-20",
+    "excerpt": "The exam isn't hard if you know Kubernetes. Except I thought I knew Kubernetes. Week 1 notes from someone with years of cloud ops who still got humbled by the CKA.",
+    "tags": [
+      "cka",
+      "kubernetes",
+      "certification"
+    ],
+    "prereqs": [
+      "Kubernetes cluster experience",
+      "kubectl comfort",
+      "Cloud ops background"
+    ],
+    "featured": false,
+    "readTime": "9 min",
+    "order": 0,
+    "url": "/p/cka-prep-after-7-years-cloud-ops/"
+  }
+]

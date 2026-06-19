@@ -1,0 +1,13 @@
+{
+  "name": "eknathalabs-blog",
+  "version": "1.0.0",
+  "description": "Real DevOps. Real Fixes. No Fluff. — Markdown-driven static blog.",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3"
+  },
+  "license": "MIT"
+}

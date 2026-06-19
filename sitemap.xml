@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://blog.eknathalabs.com/</loc></url>
+  <url><loc>https://blog.eknathalabs.com/p/linux-troubleshooting-playbook/</loc><lastmod>2026-04-28</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/linux-log-analysis-grep-awk-journalctl/</loc><lastmod>2026-04-23</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/tif-df-shows-100-but-du-disagrees/</loc><lastmod>2026-04-21</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/bashrc-vimrc-aliases-explained/</loc><lastmod>2026-04-19</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/crashloopbackoff-3am/</loc><lastmod>2026-04-18</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/system-monitoring-deep-dive/</loc><lastmod>2026-04-17</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/find-files-modified-24h-fleet/</loc><lastmod>2026-04-15</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/tmux-config-explained/</loc><lastmod>2026-04-14</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/linux-networking-commands-production/</loc><lastmod>2026-04-10</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/pod-stuck-terminating-4-causes/</loc><lastmod>2026-04-05</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/linux-process-management-signals-zombies/</loc><lastmod>2026-04-03</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/parse-100k-line-log-without-loading/</loc><lastmod>2026-03-30</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/rsync-vs-scp-which-and-when/</loc><lastmod>2026-03-25</lastmod></url>
+  <url><loc>https://blog.eknathalabs.com/p/cka-prep-after-7-years-cloud-ops/</loc><lastmod>2026-03-20</lastmod></url>
+</urlset>
