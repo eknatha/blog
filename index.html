@@ -10,6 +10,9 @@
   <meta name="author" content="Eknatha">
   <meta name="keywords" content="DevOps, Linux, Kubernetes, Platform Engineering, SRE, AWS, Azure, Terraform, CKA, dotfiles">
   <link rel="canonical" href="https://blog.eknathalabs.com/">
+  <link rel="alternate" type="application/rss+xml" title="EknathaLabs Blog" href="/feed.xml">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","name":"EknathaLabs Blog","description":"Real DevOps. Real Fixes. No Fluff.","url":"https://blog.eknathalabs.com/","author":{"@type":"Person","name":"Eknatha Reddy Puli"}}</script>
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://blog.eknathalabs.com/">
   <meta property="og:title"       content="EknathaLabs Blog — Real DevOps. Real Fixes.">
@@ -20,9 +23,13 @@
   <meta name="twitter:description" content="Real DevOps. Real Fixes. No Fluff.">
 
   <!-- Fonts -->
+  <!-- Fonts: local self-hosted (offline) is primary; Google Fonts is the
+       fallback until you run ./fetch-fonts.sh. If neither loads, CSS falls
+       back to system fonts (Georgia / Courier New / sans-serif). -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link href="/assets/fonts/fonts.css" rel="stylesheet" onerror="this.remove()">
 
   <style>
     /* ═══ TOKENS ═══════════════════════════════════════ */
@@ -314,6 +321,7 @@
     }
     #posts-grid { display: flex; flex-direction: column; gap: 12px; }
 
+    .post-card-link { display:block; }
     .post-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--r); padding: 24px;
@@ -962,17 +970,17 @@
       </div>
     </div>
     <div class="featured-content">
-      <span class="post-series series-k8s">☸ Kubernetes War Stories</span>
-      <h2>CrashLoopBackOff at 3 AM — <em>How I Traced It in 8 Minutes</em></h2>
-      <p>A payment service was restarting every 90 seconds. No alerts fired on the actual root cause. Here's the exact kubectl sequence that exposed a silent selector mismatch — and why this pattern will happen again.</p>
-      <div class="post-meta">
+      <span class="post-series series-k8s" id="feat-series">☸ Kubernetes War Stories</span>
+      <h2 id="feat-title">CrashLoopBackOff at 3 AM — <em>How I Traced It in 8 Minutes</em></h2>
+      <p id="feat-excerpt">A payment service was restarting every 90 seconds. No alerts fired on the actual root cause. Here's the exact kubectl sequence that exposed a silent selector mismatch — and why this pattern will happen again.</p>
+      <div class="post-meta" id="feat-meta">
         <span>Apr 18, 2026</span>
         <span class="meta-sep">·</span>
         <span class="read-time">7 min read</span>
         <span class="meta-sep">·</span>
         <span>#kubernetes #debugging #production</span>
       </div>
-      <a href="#" class="btn-read">Read Post <span class="arrow">→</span></a>
+      <a href="/p/crashloopbackoff-3am/" class="btn-read" id="feat-link">Read Post <span class="arrow">→</span></a>
     </div>
   </article>
 
@@ -1003,683 +1011,7 @@
     </div>
 
     <div id="posts-grid">
-
-      <!-- POST: Linux Troubleshooting Playbook -->
-      <article class="post-card"
-        data-series="linux"
-        data-tags="linux troubleshooting playbook sre devops incident production debugging uptime journalctl lsof iostat"
-        data-date="2026-04-28"
-        data-title="My Linux Troubleshooting Playbook — 16 Steps from Any Production Incident"
-        data-prereqs="Basic Linux CLI,systemctl basics,sudo access"
-        data-order="1">
-        <div class="card-body">
-          <span class="post-series series-linux card-series">◈ Linux 100 · #01</span>
-          <div class="card-title">My Linux Troubleshooting Playbook — 16 Steps from Any Production Incident</div>
-          <div class="card-excerpt">Production systems fail. The gap between a 5-minute fix and a 3-hour war room is a structured approach. Here's the exact 16-step workflow I've used across 7 years of cloud ops — from load averages to tracing deleted files holding disk space hostage.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-01 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">uptime</span></div>
-              <span class="cs-out">10:25:01 up 5 days,  load average: <span class="cs-hi">4.20</span>, 3.80, 2.10  ← spike!</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">journalctl -u app -f --since "10 min ago"</span></div>
-              <span class="cs-err">OOMKilled: process app-server (pid 4821) killed</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">lsof | grep deleted</span></div>
-              <span class="cs-out">java  1847  /var/log/app.log (deleted) <span class="cs-hi">27GB</span></span>
-              <span class="cs-ok">✓ root cause found — step 12 of the playbook</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 28, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">7 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#troubleshooting</span><span class="tag">#sre</span><span class="tag">#incident-response</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Log Analysis -->
-      <article class="post-card"
-        data-series="linux"
-        data-tags="linux logs journalctl grep awk log-analysis sre devops auth nginx"
-        data-date="2026-04-23"
-        data-title="Linux Log Analysis for DevOps: grep, awk, journalctl and What to Actually Look For"
-        data-prereqs="Basic bash,grep basics,systemd familiarity"
-        data-order="2">
-        <div class="card-body">
-          <span class="post-series series-linux card-series">◈ Linux 100 · #02</span>
-          <div class="card-title">Linux Log Analysis for DevOps: grep, awk, journalctl and What to Actually Look For</div>
-          <div class="card-excerpt">Logs are the single best source of truth in any incident — but only if you know where to look. Covers the real workflow: systemd journals, filtering failed auth attempts, extracting signal from noise with grep and awk, and tail patterns that actually tell you something.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-01 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">grep "Failed password" /var/log/auth.log | wc -l</span></div>
-              <span class="cs-err">4821  ← brute force in progress</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">awk '{print $9}' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -5</span></div>
-              <span class="cs-out">  <span class="cs-hi">2043</span> 200   831 404   12 500</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">journalctl -u nginx --since "1 hour ago" -p err</span></div>
-              <span class="cs-ok">✓ filtered to errors only — 3 lines, root cause visible</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 23, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">6 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#logs</span><span class="tag">#grep</span><span class="tag">#awk</span><span class="tag">#journalctl</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: System Monitoring -->
-      <article class="post-card"
-        data-series="linux"
-        data-tags="linux monitoring cpu memory disk io top htop vmstat iostat sar performance"
-        data-date="2026-04-17"
-        data-title="System Monitoring Deep Dive: What top Doesn't Tell You (and What Does)"
-        data-prereqs="Basic Linux CLI,top/htop usage,sudo access"
-        data-order="3">
-        <div class="card-body">
-          <span class="post-series series-linux card-series">◈ Linux 100 · #03</span>
-          <div class="card-title">System Monitoring Deep Dive: What top Doesn't Tell You (and What Does)</div>
-          <div class="card-excerpt">Everyone knows top. But when a server crawls and top shows nothing obvious, where do you look? This covers the full stack: CPU steal time, memory pressure vs swap usage, I/O wait, and the vmstat + iostat combo that actually tells you what's blocking your system.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-02 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">vmstat 2 5</span></div>
-              <span class="cs-out">r  b   swpd   free   buff   cache   wa  st</span>
-              <span class="cs-err">4  8      0  12000   2000  400000  <span class="cs-hi">68</span>   0  ← wa=68% I/O wait!</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">iostat -x 2 | grep -v "^$"</span></div>
-              <span class="cs-out">sda   r/s: 0.0  w/s: <span class="cs-hi">842.0</span>  await: 180ms  ← saturated</span>
-              <span class="cs-ok">✓ disk write saturation — not CPU, not memory</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 17, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">8 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#monitoring</span><span class="tag">#performance</span><span class="tag">#iostat</span><span class="tag">#vmstat</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Networking Commands -->
-      <article class="post-card"
-        data-series="linux"
-        data-tags="linux networking ss lsof tcpdump netstat dns dig traceroute devops troubleshooting"
-        data-date="2026-04-10"
-        data-title="Linux Networking Commands I Actually Use in Production (Not Just ping)"
-        data-prereqs="Basic Linux CLI,TCP/IP basics,sudo access"
-        data-order="4">
-        <div class="card-body">
-          <span class="post-series series-linux card-series">◈ Linux 100 · #04</span>
-          <div class="card-title">Linux Networking Commands I Actually Use in Production (Not Just ping)</div>
-          <div class="card-excerpt">ping tells you a host is alive. But which process is holding port 8080? Why is DNS resolution slow only for this one service? Why is the connection established but no traffic flowing? Real production toolkit: ss, lsof -i, dig, tcpdump — with actual use cases for each.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-01 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">ss -tulnp | grep 8080</span></div>
-              <span class="cs-out">tcp  LISTEN  0  128  *:8080  users:(("<span class="cs-hi">java</span>",pid=3241,fd=42))</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">dig +short api.internal @10.0.0.2</span></div>
-              <span class="cs-err">;; connection timed out  ← internal DNS down</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">tcpdump -i eth0 -n port 8080 -c 20</span></div>
-              <span class="cs-ok">✓ SYN_SENT but no SYN-ACK — firewall rule missing</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 10, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">6 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#networking</span><span class="tag">#ss</span><span class="tag">#tcpdump</span><span class="tag">#dns</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Process Management -->
-      <article class="post-card"
-        data-series="linux"
-        data-tags="linux processes ps kill signals zombie defunct strace pstree devops sre"
-        data-date="2026-04-03"
-        data-title="Linux Process Management: Signals, Zombies, and When kill -9 Is the Wrong Answer"
-        data-prereqs="Basic Linux CLI,process concepts,sudo access"
-        data-order="5">
-        <div class="card-body">
-          <span class="post-series series-linux card-series">◈ Linux 100 · #05</span>
-          <div class="card-title">Linux Process Management: Signals, Zombies, and When kill -9 Is the Wrong Answer</div>
-          <div class="card-excerpt">kill -9 is the nuclear option — it works, but skips cleanup handlers and can corrupt state. How Linux signals actually work, how to identify zombie processes, how to use strace to see what a hung process is doing, and the safe termination sequence every SRE should know.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-03 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">ps aux | awk '$8=="Z" {print $2, $11}'</span></div>
-              <span class="cs-out"><span class="cs-hi">8 zombie processes</span> — all children of pid 1024</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">strace -p 1024 -e trace=wait4 2>&1 | head</span></div>
-              <span class="cs-err">strace: Process 1024 attached — blocked in wait()</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">kill -15 1024 &amp;&amp; sleep 3 &amp;&amp; kill -9 1024</span></div>
-              <span class="cs-ok">✓ SIGTERM first, SIGKILL only if no response in 3s</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 03, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">5 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#processes</span><span class="tag">#signals</span><span class="tag">#strace</span><span class="tag">#debugging</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- ╔═══ NEW POST GOES HERE — paste above this line ═══╗ -->
-
-      <!-- POST: TIF #01 — df vs du -->
-      <article class="post-card"
-        data-series="tif"
-        data-tags="linux df du lsof storage disk inode"
-        data-date="2026-04-21"
-        data-title="TIF #01 — df Shows 100% But du Disagrees"
-        data-prereqs="Basic Linux CLI,df/du commands,Root or sudo access"
-        data-order="1">
-        <div class="card-body">
-          <span class="post-series series-tif card-series">⚡ Today I Fixed</span>
-          <div class="card-title">TIF #01 — df Shows 100% But du Disagrees</div>
-          <div class="card-excerpt">Deleted log files held open by a running process. <code style="font-family:var(--mono);color:var(--green);font-size:12px">df</code> counted the space as used, <code style="font-family:var(--mono);color:var(--green);font-size:12px">du</code> didn't see it. <code style="font-family:var(--mono);color:var(--green);font-size:12px">lsof</code> found the culprit in 30 seconds.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-03 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">df -h /</span></div>
-              <span class="cs-out">Filesystem  Size  Used  Avail  Use%</span>
-              <span class="cs-err">/dev/sda1    50G   50G     0G  100%  ← alarm fires</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">du -sh /*</span></div>
-              <span class="cs-out">... total: <span class="cs-hi">23G</span>  ← only 23G visible?</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">lsof +L1 | grep deleted</span></div>
-              <span class="cs-out">java  1847  /var/log/app.log (deleted) <span class="cs-hi">27GB</span></span>
-              <span class="cs-ok">✓ kill -HUP 1847  →  27GB freed instantly</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 21, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">2 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#storage</span><span class="tag">#lsof</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Dotfiles — .bashrc -->
-      <article class="post-card"
-        data-series="dotfiles"
-        data-tags="dotfiles bashrc vimrc aliases bash linux productivity"
-        data-date="2026-04-19"
-        data-title="My .bashrc, .vimrc & Aliases — Every Line Explained"
-        data-prereqs="Basic bash usage,vim basics,SSH key setup"
-        data-order="1">
-        <div class="card-body">
-          <span class="post-series series-dotfiles card-series">⚙ My Dotfiles Explained</span>
-          <div class="card-title">My .bashrc, .vimrc &amp; Aliases — Every Line Explained</div>
-          <div class="card-excerpt">13+ years of ops muscle memory, written down. Prompt tuning, kubectl shortcuts, SSH multiplexing, and the aliases I reach for every single day.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">~/.bashrc (excerpt)</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <span class="cs-comment"># Smart prompt: user@host:dir (git branch)</span>
-              <div><span class="cs-cmd">PS1='\[\e[32m\]\u@\h\[\e[0m\]:\[\e[34m\]\w\[\e[33m\]$(__git_ps1)\[\e[0m\]\$ '</span></div>
-              <span class="cs-comment"># kubectl shortcuts — used 50x a day</span>
-              <div><span class="cs-cmd">alias k='kubectl'</span></div>
-              <div><span class="cs-cmd">alias kgp='kubectl get pods -o wide'</span></div>
-              <div><span class="cs-cmd">alias kns='kubectl config set-context --current --namespace'</span></div>
-              <span class="cs-comment"># SSH jump via bastion without -J flag</span>
-              <div><span class="cs-cmd">alias ssh-prod='ssh -J bastion.internal eknatha@prod'</span></div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 19, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">11 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#dotfiles</span><span class="tag">#bash</span><span class="tag">#productivity</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Linux 100 #12 — find fleet -->
-      <article class="post-card"
-        data-series="linux"
-        data-tags="linux find fleet mtime newer xargs parallel"
-        data-date="2026-04-15"
-        data-title="Find All Files Modified in Last 24 Hours Across a Fleet"
-        data-prereqs="find command basics,SSH access to nodes,Basic shell scripting"
-        data-order="12">
-        <div class="card-body">
-          <span class="post-series series-linux card-series">◈ Linux 100 · #12</span>
-          <div class="card-title">Find All Files Modified in Last 24 Hours Across a Fleet</div>
-          <div class="card-excerpt">Using <code style="font-family:var(--mono);color:var(--green);font-size:12px">find -mtime</code>, <code style="font-family:var(--mono);color:var(--green);font-size:12px">-newer</code>, and how to pipe results to a remote collector without spawning 40 subshells.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-01 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <span class="cs-comment"># Find files changed in last 24h, exclude /proc /sys</span>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">find / -mtime -1 -type f \</span></div>
-              <div style="padding-left:16px"><span class="cs-cmd">-not \( -path "/proc/*" -o -path "/sys/*" \) \</span></div>
-              <div style="padding-left:16px"><span class="cs-cmd">2>/dev/null | wc -l</span></div>
-              <span class="cs-out">1,847 files</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">find /etc /var/log -newer /tmp/ref -ls 2>/dev/null</span></div>
-              <span class="cs-out">12345  4  -rw-r--r--  root  <span class="cs-hi">/etc/nginx/nginx.conf</span>  Apr 15 03:22</span>
-              <span class="cs-out">12350  8  -rw-r-----  root  <span class="cs-hi">/var/log/auth.log</span>      Apr 15 03:19</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 15, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">5 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#find</span><span class="tag">#fleet</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Dotfiles — tmux -->
-      <article class="post-card"
-        data-series="dotfiles"
-        data-tags="dotfiles tmux terminal sessions devops split panes"
-        data-date="2026-04-14"
-        data-title="My tmux Config — Split Panes, Session Persistence & DevOps Shortcuts"
-        data-prereqs="tmux installed,Basic terminal usage,Read .bashrc post first"
-        data-order="2">
-        <div class="card-body">
-          <span class="post-series series-dotfiles card-series">⚙ My Dotfiles Explained</span>
-          <div class="card-title">My tmux Config — Split Panes, Session Persistence &amp; DevOps Shortcuts</div>
-          <div class="card-excerpt">Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that saved me when SSH dropped mid-deploy.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">~/.tmux.conf (excerpt)</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <span class="cs-comment"># Prefix: Ctrl+a (like screen, more natural)</span>
-              <div><span class="cs-cmd">set -g prefix C-a</span></div>
-              <span class="cs-comment"># Split: | for vertical, - for horizontal</span>
-              <div><span class="cs-cmd">bind | split-window -h -c "#{pane_current_path}"</span></div>
-              <div><span class="cs-cmd">bind - split-window -v -c "#{pane_current_path}"</span></div>
-              <span class="cs-comment"># One-key incident layout: logs | shell | top</span>
-              <div><span class="cs-cmd">bind I source ~/.tmux/incident-layout.conf</span></div>
-              <span class="cs-comment"># Session per cluster</span>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">tmux new -s prod-k8s</span></div>
-              <span class="cs-out">Session prod-k8s created  ← persists if SSH drops</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 14, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">7 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#tmux</span><span class="tag">#dotfiles</span><span class="tag">#terminal</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: K8s — Pod Terminating -->
-      <article class="post-card"
-        data-series="k8s"
-        data-tags="kubernetes pods terminating finalizers pvc webhook"
-        data-date="2026-04-05"
-        data-title="Pod Stuck in Terminating — 4 Root Causes and How to Force It"
-        data-prereqs="kubectl basics,Kubernetes cluster access,Basic understanding of Pods"
-        data-order="2">
-        <div class="card-body">
-          <span class="post-series series-k8s card-series">☸ Kubernetes War Stories · #02</span>
-          <div class="card-title">Pod Stuck in Terminating — 4 Root Causes and How to Force It</div>
-          <div class="card-excerpt">Finalizers, PVCs, network policies, and webhook timeouts. Four reasons a pod won't die — and the safe way to handle each one without corrupting state.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-cluster ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">kubectl get pod nginx-77d9 -o json | jq '.metadata.finalizers'</span></div>
-              <span class="cs-err">["kubernetes.io/pvc-protection"]  ← finalizer holding it</span>
-              <div style="margin-top:6px"><span class="cs-prompt">$ </span><span class="cs-cmd">kubectl patch pod nginx-77d9 -p \</span></div>
-              <div style="padding-left:16px"><span class="cs-cmd">'{"metadata":{"finalizers":null}}'</span></div>
-              <span class="cs-ok">pod/nginx-77d9 patched  →  Terminated immediately</span>
-              <div style="margin-top:6px"><span class="cs-comment"># Root cause 2: webhook timeout (no --force needed)</span></div>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">kubectl describe pod nginx-77d9 | grep -A5 Events</span></div>
-              <span class="cs-err">Warning  FailedKillPod  hook "istio-proxy" timeout (30s)</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Apr 5, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">6 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#kubernetes</span><span class="tag">#debugging</span><span class="tag">#finalizers</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Linux 100 #08 — Log parsing -->
-      <article class="post-card"
-        data-series="linux"
-        data-tags="linux awk sed grep log analysis memory streaming"
-        data-date="2026-03-30"
-        data-title="Parse a 100K-Line Log File Without Loading It Into Memory"
-        data-prereqs="grep and awk basics,Access to log files,Basic piping in bash"
-        data-order="8">
-        <div class="card-body">
-          <span class="post-series series-linux card-series">◈ Linux 100 · #08</span>
-          <div class="card-title">Parse a 100K-Line Log File Without Loading It Into Memory</div>
-          <div class="card-excerpt"><code style="font-family:var(--mono);color:var(--green);font-size:12px">awk</code>, <code style="font-family:var(--mono);color:var(--green);font-size:12px">sed</code>, and <code style="font-family:var(--mono);color:var(--green);font-size:12px">grep</code> patterns that run in constant memory. When you can't afford to <code style="font-family:var(--mono);color:var(--green);font-size:12px">cat</code> a 2GB log on a live prod node.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">eknatha@prod-node-01 ~</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <span class="cs-comment"># Count ERRORs without loading 2GB into RAM</span>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">awk '/ERROR/{count++} END{print count " errors"}' app.log</span></div>
-              <span class="cs-out">4,821 errors</span>
-              <div style="margin-top:6px"><span class="cs-comment"># Extract IPs of 5xx errors (streaming, constant mem)</span></div>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">grep " 5[0-9][0-9] " access.log | awk '{print $1}' | sort | uniq -c | sort -rn | head -5</span></div>
-              <span class="cs-out">  892  <span class="cs-hi">10.0.4.23</span>   ← bot hammering /api/v1</span>
-              <span class="cs-out">  341  10.0.4.78</span>
-              <span class="cs-out">   87  10.0.4.12</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Mar 30, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">4 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#linux</span><span class="tag">#awk</span><span class="tag">#logs</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: Quick Tips — rsync vs scp -->
-      <article class="post-card"
-        data-series="tips"
-        data-tags="rsync scp file transfer linux delta resume"
-        data-date="2026-03-25"
-        data-title="rsync vs scp — Which One and When"
-        data-prereqs="Basic Linux CLI,SSH access"
-        data-order="1">
-        <div class="card-body">
-          <span class="post-series series-tips card-series">◎ Quick Tips</span>
-          <div class="card-title">rsync vs scp — Which One and When</div>
-          <div class="card-excerpt">rsync wins on resumable transfers and delta sync. scp wins on clean one-liners. Here's the exact scenarios where each belongs.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">comparison</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <span class="cs-comment"># scp: one file, trust the network, move on</span>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">scp dump.sql user@prod:/tmp/</span></div>
-              <span class="cs-out">dump.sql  100%  847MB  62.3MB/s  00:13</span>
-              <div style="margin-top:6px"><span class="cs-comment"># rsync: large dir, resumable, delta only</span></div>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">rsync -avz --progress /data/ user@prod:/data/</span></div>
-              <span class="cs-out">sent 12.3GB  received 2.1KB  →  only 340MB transferred</span>
-              <span class="cs-ok">↑ delta sync: skipped 11.9GB of unchanged files</span>
-              <div style="margin-top:6px"><span class="cs-comment"># rsync: safe deploy with --dry-run first</span></div>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">rsync -avzn /app/ user@prod:/app/  # -n = dry run</span></div>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Mar 25, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">3 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#rsync</span><span class="tag">#scp</span><span class="tag">#linux</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- POST: PE — CKA Prep -->
-      <article class="post-card"
-        data-series="pe"
-        data-tags="cka kubernetes certification exam cloud ops kodeKloud"
-        data-date="2026-03-20"
-        data-title="CKA Prep After 7+ Years of Cloud Ops — What Surprised Me"
-        data-prereqs="Kubernetes cluster experience,kubectl comfort,Cloud ops background"
-        data-order="2">
-        <div class="card-body">
-          <span class="post-series series-pe card-series">⬡ Platform Eng in Progress · #02</span>
-          <div class="card-title">CKA Prep After 7+ Years of Cloud Ops — What Surprised Me</div>
-          <div class="card-excerpt">The exam isn't hard if you know Kubernetes. Except I thought I knew Kubernetes. Week 1 notes from someone with real cluster experience who still got humbled by imperative kubectl.</div>
-          <div class="card-snippet">
-            <div class="cs-bar">
-              <span class="cs-dot r"></span><span class="cs-dot y"></span><span class="cs-dot g"></span>
-              <span class="cs-label">CKA speed tricks — imperative over YAML</span>
-              <button class="cs-copy" onclick="copySnippet(this)">copy</button>
-            </div>
-            <div class="cs-body">
-              <span class="cs-comment"># Create pod fast — no YAML editing under time pressure</span>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">kubectl run nginx --image=nginx --port=80 \</span></div>
-              <div style="padding-left:16px"><span class="cs-cmd">--dry-run=client -o yaml > pod.yaml</span></div>
-              <span class="cs-comment"># Create service immediately</span>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">kubectl expose pod nginx --port=80 --type=NodePort</span></div>
-              <span class="cs-out">service/nginx exposed</span>
-              <span class="cs-comment"># What caught me: ETCD backup (memorise this path)</span>
-              <div><span class="cs-prompt">$ </span><span class="cs-cmd">ETCDCTL_API=3 etcdctl snapshot save /tmp/etcd-backup.db \</span></div>
-              <div style="padding-left:16px"><span class="cs-cmd">--endpoints=https://127.0.0.1:2379 --cacert --cert --key</span></div>
-              <span class="cs-ok">Snapshot saved at /tmp/etcd-backup.db</span>
-            </div>
-          </div>
-          <div class="card-footer">
-            <div class="post-meta">
-              <span>Mar 20, 2026</span><span class="meta-sep">·</span>
-              <span class="read-time">9 min</span>
-            </div>
-          </div>
-          <div class="card-tags"><span class="tag">#cka</span><span class="tag">#kubernetes</span><span class="tag">#certification</span></div>
-          <div class="prereq-block">
-            <div class="prereq-toggle" onclick="togglePrereq(this)">
-              <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
-            </div>
-            <div class="prereq-body">
-              <div class="prereq-pills"></div>
-              <p class="prereq-note">You should be comfortable running these before reading.</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-right-col">
-          <div class="read-ring-wrap" onclick="toggleRead(this)" title="Mark as read"></div>
-          <div class="card-arrow" aria-hidden="true">→</div>
-        </div>
-      </article>
-
-      <!-- ╚═══ END OF POSTS — new posts go above this line ═══╝ -->
-
+      <div id="grid-loading" style="font-family:var(--mono);font-size:13px;color:var(--muted);padding:30px 0;text-align:center">loading posts…</div>
     </div><!-- /#posts-grid -->
 
     <div class="load-more-wrap" style="margin-top:20px">
@@ -1839,7 +1171,7 @@
       <a href="https://eknatha.github.io/interview-prep">Interview Prep</a>
       <a href="https://eknatha.github.io/linux-command-explainer">CLI Explainer</a>
       <a href="https://eknathareddyp.github.io/github-profile-analyzer">Profile Analyzer</a>
-      <a href="#">RSS</a>
+      <a href="/feed.xml">RSS</a>
     </div>
   </div>
 </footer>
@@ -1848,18 +1180,131 @@
      JAVASCRIPT
 ════════════════════════════════════════════════════════ -->
 <script>
-// ── Page reading progress bar ────────────────────────────
+// ── Page reading progress bar (rAF-throttled) ────────────
+let _pbTick = false;
 window.addEventListener('scroll', () => {
-  const el  = document.documentElement;
-  const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
-  document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
-});
+  if (_pbTick) return;
+  _pbTick = true;
+  requestAnimationFrame(() => {
+    const el  = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+    _pbTick = false;
+  });
+}, { passive: true });
+
+// ══════════════════════════════════════════════════════════
+// POSTS.JSON LOADER  — single source of truth
+// Cards are no longer hardcoded. We fetch /posts.json (emitted
+// by build.js from posts/*.md) and render real, linked cards.
+// Everything downstream (filter/search/counts/tracker) keeps
+// reading the rendered DOM via getPosts(), so it's unchanged.
+// ══════════════════════════════════════════════════════════
+const SERIES_META = {
+  linux:    { badge:'◈', label:'Linux 100',     cls:'series-linux'    },
+  k8s:      { badge:'☸', label:'Kubernetes',    cls:'series-k8s'      },
+  pe:       { badge:'⬡', label:'Platform Eng',  cls:'series-pe'       },
+  dotfiles: { badge:'⚙', label:'Dotfiles',      cls:'series-dotfiles' },
+  tif:      { badge:'⚡', label:'Today I Fixed', cls:'series-tif'      },
+  tips:     { badge:'◎', label:'Quick Tips',    cls:'series-tips'     },
+};
+
+function escAttr(s){ return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function fmtCardDate(iso){
+  try { return new Date(iso+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+  catch(e){ return iso; }
+}
+
+function renderCard(p){
+  const s = SERIES_META[p.series] || { badge:'•', label:p.series, cls:'' };
+  const seriesLabel = `${s.badge} ${s.label}${p.seriesNo ? ' · #'+p.seriesNo : ''}`;
+  const tags = (p.tags||[]).map(t => `<span class="tag">#${escAttr(t)}</span>`).join('');
+  const prereqAttr = (p.prereqs||[]).join(',');
+  return `
+    <a class="post-card-link" href="${p.url}" style="display:block;color:inherit">
+    <article class="post-card"
+      data-series="${escAttr(p.series)}"
+      data-slug="${escAttr(p.slug)}"
+      data-tags="${escAttr((p.tags||[]).join(' '))}"
+      data-date="${escAttr(p.date)}"
+      data-title="${escAttr(p.title)}"
+      data-prereqs="${escAttr(prereqAttr)}"
+      data-order="${p.seriesNo || p.order || 0}">
+      <div class="card-body">
+        <span class="post-series ${s.cls} card-series">${seriesLabel}</span>
+        <div class="card-title">${escAttr(p.title)}</div>
+        <div class="card-excerpt">${escAttr(p.excerpt)}</div>
+        <div class="card-footer">
+          <div class="post-meta">
+            <span>${fmtCardDate(p.date)}</span><span class="meta-sep">·</span>
+            <span class="read-time">${escAttr(p.readTime)}</span>
+          </div>
+        </div>
+        <div class="card-tags">${tags}</div>
+        <div class="prereq-block">
+          <div class="prereq-toggle" onclick="togglePrereq(event,this)">
+            <span class="ptlabel">Prerequisites</span><span class="prereq-chevron">▾</span>
+          </div>
+          <div class="prereq-body">
+            <div class="prereq-pills"></div>
+            <p class="prereq-note">You should be comfortable running these before reading.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-right-col">
+        <div class="read-ring-wrap" onclick="toggleRead(event,this)" title="Reading progress"></div>
+        <div class="card-arrow" aria-hidden="true">→</div>
+      </div>
+    </article>
+    </a>`;
+}
+
+function renderFeatured(posts){
+  const f = posts.find(p => p.featured) || posts[0];
+  if (!f) return;
+  const s = SERIES_META[f.series] || { badge:'•', label:f.series, cls:'' };
+  const seriesEl = document.getElementById('feat-series');
+  seriesEl.className = 'post-series ' + s.cls;
+  seriesEl.textContent = `${s.badge} ${s.label}`;
+  // Title: italicize the clause after the em-dash (the hero's accent style)
+  const t = f.title;
+  document.getElementById('feat-title').innerHTML = t.includes('—')
+    ? escAttr(t.replace(/—\s*(.+)$/, '')) + '— <em>' + escAttr(t.replace(/^.*—\s*/, '')) + '</em>'
+    : escAttr(t);
+  document.getElementById('feat-excerpt').textContent = f.excerpt;
+  document.getElementById('feat-meta').innerHTML =
+    `<span>${fmtCardDate(f.date)}</span><span class="meta-sep">·</span>` +
+    `<span class="read-time">${escAttr(f.readTime)} read</span><span class="meta-sep">·</span>` +
+    `<span>${(f.tags||[]).map(t=>'#'+escAttr(t)).join(' ')}</span>`;
+  document.getElementById('feat-link').setAttribute('href', f.url);
+}
+
+// Posts data is INLINED here by build.js so the site is fully offline —
+// works from file://, no network, no fetch. The markers below are how the
+// build step finds and replaces this block. Do not edit by hand.
+/* POSTS_DATA_START */
+window.__POSTS__ = [{"slug":"linux-troubleshooting-playbook","title":"My Linux Troubleshooting Playbook — 16 Steps from Any Production Incident","series":"linux","seriesNo":"01","date":"2026-04-28","excerpt":"Production systems fail. The gap between a 5-minute fix and a 3-hour war room is a structured approach. Here's the exact 16-step workflow I've used across 7 years of cloud ops — from load averages to tracing deleted files holding disk space hostage.","tags":["linux","troubleshooting","sre","incident-response"],"prereqs":["Basic Linux CLI","systemctl basics","sudo access"],"featured":false,"readTime":"7 min","order":0,"url":"/p/linux-troubleshooting-playbook/"},{"slug":"linux-log-analysis-grep-awk-journalctl","title":"Linux Log Analysis for DevOps: grep, awk, journalctl and What to Actually Look For","series":"linux","seriesNo":"02","date":"2026-04-23","excerpt":"Logs are the single best source of truth in any incident — but only if you know where to look. Covers the real workflow: systemd journals, filtering failed auth attempts, extracting signal from noise with grep and awk, and tail patterns that actually tell you something.","tags":["linux","logs","grep","awk","journalctl"],"prereqs":["Basic bash","grep basics","systemd familiarity"],"featured":false,"readTime":"6 min","order":0,"url":"/p/linux-log-analysis-grep-awk-journalctl/"},{"slug":"tif-df-shows-100-but-du-disagrees","title":"TIF #01 — df Shows 100% But du Disagrees","series":"tif","seriesNo":"01","date":"2026-04-21","excerpt":"Deleted log files held open by a running process. The space won't free until the file handle closes — here's the one-liner that finds the culprit.","tags":["linux","storage","lsof"],"prereqs":["Basic Linux CLI","df/du commands","Root or sudo access"],"featured":false,"readTime":"2 min","order":0,"url":"/p/tif-df-shows-100-but-du-disagrees/"},{"slug":"bashrc-vimrc-aliases-explained","title":"My .bashrc, .vimrc & Aliases — Every Line Explained","series":"dotfiles","seriesNo":"01","date":"2026-04-19","excerpt":"13+ years of ops muscle memory, written down. Prompt tuning, kubectl shortcuts, SSH multiplexing, and the aliases that have saved me thousands of keystrokes.","tags":["dotfiles","bash","productivity"],"prereqs":["Basic bash usage","vim basics","SSH key setup"],"featured":false,"readTime":"11 min","order":0,"url":"/p/bashrc-vimrc-aliases-explained/"},{"slug":"crashloopbackoff-3am","title":"CrashLoopBackOff at 3 AM — How I Traced It in 8 Minutes","series":"k8s","seriesNo":"01","date":"2026-04-18","excerpt":"A payment service was restarting every 90 seconds. No alerts fired on the actual root cause. Here's the exact kubectl sequence that exposed a silent selector mismatch — and why this pattern will happen again.","tags":["kubernetes","debugging","production"],"prereqs":["kubectl basics","Kubernetes cluster access","Service/Endpoint concepts"],"featured":true,"readTime":"7 min","order":0,"url":"/p/crashloopbackoff-3am/"},{"slug":"system-monitoring-deep-dive","title":"System Monitoring Deep Dive: What top Doesn't Tell You (and What Does)","series":"linux","seriesNo":"03","date":"2026-04-17","excerpt":"Everyone knows top. But when a server crawls and top shows nothing obvious, where do you look? This covers the full stack: CPU steal time, memory pressure vs swap usage, I/O wait, and the vmstat + iostat combo that actually tells you what's blocking your system.","tags":["linux","monitoring","performance","iostat","vmstat"],"prereqs":["Basic Linux CLI","top/htop usage","sudo access"],"featured":false,"readTime":"8 min","order":0,"url":"/p/system-monitoring-deep-dive/"},{"slug":"find-files-modified-24h-fleet","title":"Find All Files Modified in Last 24 Hours Across a Fleet","series":"linux","seriesNo":"12","date":"2026-04-15","excerpt":"Using find -mtime to audit changes across a fleet of nodes — and how to safely exclude virtual filesystems so you don't drown in /proc noise.","tags":["linux","find","fleet"],"prereqs":["find command basics","SSH access to nodes","Basic shell scripting"],"featured":false,"readTime":"5 min","order":0,"url":"/p/find-files-modified-24h-fleet/"},{"slug":"tmux-config-explained","title":"My tmux Config — Split Panes, Session Persistence & the One Plugin That Saved Me","series":"dotfiles","seriesNo":"02","date":"2026-04-14","excerpt":"Named sessions per cluster, pane layouts for logs + shell + metrics, and the plugin that survives a dropped SSH connection so you never lose a long-running job again.","tags":["tmux","dotfiles","terminal"],"prereqs":["tmux installed","Basic terminal usage","Read .bashrc post first"],"featured":false,"readTime":"7 min","order":0,"url":"/p/tmux-config-explained/"},{"slug":"linux-networking-commands-production","title":"Linux Networking Commands I Actually Use in Production (Not Just ping)","series":"linux","seriesNo":"04","date":"2026-04-10","excerpt":"ping tells you a host is alive. But which process is holding port 8080? Why is DNS resolution slow only for this one service? Why is the connection established but no traffic flowing? Real production toolkit: ss, lsof -i, dig, tcpdump — with actual use cases for each.","tags":["linux","networking","ss","tcpdump","dns"],"prereqs":["Basic Linux CLI","TCP/IP basics","sudo access"],"featured":false,"readTime":"6 min","order":0,"url":"/p/linux-networking-commands-production/"},{"slug":"pod-stuck-terminating-4-causes","title":"Pod Stuck in Terminating — 4 Root Causes and How to Fix Each","series":"k8s","seriesNo":"02","date":"2026-04-05","excerpt":"Finalizers, PVCs, network policies, and webhook timeouts. Four reasons a pod won't die — and the right fix for each, instead of reaching for --force.","tags":["kubernetes","debugging","finalizers"],"prereqs":["kubectl basics","Kubernetes cluster access","Basic understanding of Pods"],"featured":false,"readTime":"6 min","order":0,"url":"/p/pod-stuck-terminating-4-causes/"},{"slug":"linux-process-management-signals-zombies","title":"Linux Process Management: Signals, Zombies, and When kill -9 Is the Wrong Answer","series":"linux","seriesNo":"05","date":"2026-04-03","excerpt":"kill -9 is the nuclear option — it works, but skips cleanup handlers and can corrupt state. How Linux signals actually work, how to identify zombie processes, how to use strace to see what a hung process is doing, and the safe order of escalation.","tags":["linux","processes","signals","strace","debugging"],"prereqs":["Basic Linux CLI","process concepts","sudo access"],"featured":false,"readTime":"5 min","order":0,"url":"/p/linux-process-management-signals-zombies/"},{"slug":"parse-100k-line-log-without-loading","title":"Parse a 100K-Line Log File Without Loading It Into Memory","series":"linux","seriesNo":"08","date":"2026-03-30","excerpt":"awk streams line by line in constant memory — safe to run on a 10GB log on a live production server without OOMing the box.","tags":["linux","awk","logs"],"prereqs":["grep and awk basics","Access to log files","Basic piping in bash"],"featured":false,"readTime":"4 min","order":0,"url":"/p/parse-100k-line-log-without-loading/"},{"slug":"rsync-vs-scp-which-and-when","title":"rsync vs scp — Which One and When","series":"tips","seriesNo":"01","date":"2026-03-25","excerpt":"rsync wins on resumable transfers and delta sync. scp wins on clean one-liners. Here's the quick decision rule so you stop guessing.","tags":["rsync","scp","linux"],"prereqs":["Basic Linux CLI","SSH access"],"featured":false,"readTime":"3 min","order":0,"url":"/p/rsync-vs-scp-which-and-when/"},{"slug":"cka-prep-after-7-years-cloud-ops","title":"CKA Prep After 7+ Years of Cloud Ops — What Surprised Me","series":"pe","seriesNo":"02","date":"2026-03-20","excerpt":"The exam isn't hard if you know Kubernetes. Except I thought I knew Kubernetes. Week 1 notes from someone with years of cloud ops who still got humbled by the CKA.","tags":["cka","kubernetes","certification"],"prereqs":["Kubernetes cluster experience","kubectl comfort","Cloud ops background"],"featured":false,"readTime":"9 min","order":0,"url":"/p/cka-prep-after-7-years-cloud-ops/"}];
+/* POSTS_DATA_END */
+
+function loadPosts(){
+  const grid = document.getElementById('posts-grid');
+  let posts = Array.isArray(window.__POSTS__) ? window.__POSTS__.slice() : [];
+  if (!posts.length){
+    grid.innerHTML = '<div style="font-family:var(--mono);font-size:13px;color:var(--muted);padding:30px 0;text-align:center">No posts yet. Add a <code>posts/*.md</code> file and run <code>node build.js</code>.</div>';
+    return false;
+  }
+  posts.sort((a,b)=> b.date.localeCompare(a.date));
+  renderFeatured(posts);
+  grid.innerHTML = posts.map(renderCard).join('');
+  return true;
+}
 
 // ── Post index ────────────────────────────────────────────
 function getPosts() {
   return Array.from(document.querySelectorAll('#posts-grid .post-card')).map(c => ({
     el:      c,
     series:  c.dataset.series  || '',
+    slug:    c.dataset.slug    || '',
     tags:    c.dataset.tags    || '',
     date:    c.dataset.date    || '',
     title:   c.dataset.title   || c.querySelector('.card-title')?.textContent || '',
@@ -1930,6 +1375,10 @@ function buildLatest() {
 }
 
 function jumpToPost(title) {
+  // Cards are now real pages — navigate instead of scrolling.
+  const p = getPosts().find(p => p.title === title);
+  if (p && p.slug) { window.location.href = '/p/' + p.slug + '/'; return; }
+  // Fallback: reveal in grid if slug is missing
   filterPosts('all', document.querySelector('.filter-btn'));
   setTimeout(() => {
     const card = getPosts().find(p => p.title === title);
@@ -2041,8 +1490,8 @@ function initPrerequisites() {
   });
 }
 
-function togglePrereq(toggleEl) {
-  event.stopPropagation();
+function togglePrereq(event, toggleEl) {
+  event.preventDefault(); event.stopPropagation();
   toggleEl.closest('.prereq-block').classList.toggle('open');
 }
 
@@ -2078,24 +1527,24 @@ function setRingProgress(wrap, pct, isDone) {
   }
 }
 
-function getReadKey(title) { return 'read::' + title; }
+function getReadKey(slug) { return 'read::' + slug; }
 
-function loadReadState(wrap, title) {
+function loadReadState(wrap, slug) {
   try {
-    const pct  = parseInt(localStorage.getItem(getReadKey(title))) || 0;
+    const pct  = parseInt(localStorage.getItem(getReadKey(slug))) || 0;
     setRingProgress(wrap, pct, pct >= 100);
   } catch(e) {}
 }
 
-function toggleRead(wrap) {
-  event.stopPropagation();
-  const card  = wrap.closest('.post-card');
-  const title = card?.dataset.title || '';
-  if (!title) return;
+function toggleRead(event, wrap) {
+  event.preventDefault(); event.stopPropagation();
+  const card = wrap.closest('.post-card');
+  const slug = card?.dataset.slug || '';
+  if (!slug) return;
   try {
-    const pct  = parseInt(localStorage.getItem(getReadKey(title))) || 0;
+    const pct  = parseInt(localStorage.getItem(getReadKey(slug))) || 0;
     const next = pct >= 100 ? 0 : 100;
-    localStorage.setItem(getReadKey(title), next);
+    localStorage.setItem(getReadKey(slug), next);
     setRingProgress(wrap, next, next >= 100);
     showToast(next >= 100 ? '✓ Marked as read!' : 'Marked as unread');
     refreshTrackerUI();
@@ -2108,7 +1557,7 @@ function initReadRings() {
     const wrap = p.el.querySelector('.read-ring-wrap');
     if (!wrap) return;
     buildRing(wrap);
-    loadReadState(wrap, p.title);
+    loadReadState(wrap, p.slug);
   });
 }
 
@@ -2153,7 +1602,7 @@ function refreshTrackerUI() {
 
   const rows = posts.map(p => {
     let pct = 0;
-    try { pct = parseInt(localStorage.getItem(getReadKey(p.title))) || 0; } catch(e) {}
+    try { pct = parseInt(localStorage.getItem(getReadKey(p.slug))) || 0; } catch(e) {}
     const done = pct >= 100;
     if (done) doneN++;
     const shortTitle = p.title.length > 44 ? p.title.slice(0,42) + '…' : p.title;
@@ -2175,7 +1624,7 @@ function refreshTrackerUI() {
 function updateTrackerBtn() {
   let doneN = 0;
   getPosts().forEach(p => {
-    try { if ((parseInt(localStorage.getItem(getReadKey(p.title))) || 0) >= 100) doneN++; } catch(e) {}
+    try { if ((parseInt(localStorage.getItem(getReadKey(p.slug))) || 0) >= 100) doneN++; } catch(e) {}
   });
   document.getElementById('tb-count').textContent = doneN;
 }
@@ -2199,7 +1648,7 @@ function closeTracker() {
 
 function resetSeriesProgress() {
   getPosts().filter(p => p.series === trackerActiveSeries).forEach(p => {
-    try { localStorage.removeItem(getReadKey(p.title)); } catch(e) {}
+    try { localStorage.removeItem(getReadKey(p.slug)); } catch(e) {}
     const wrap = p.el.querySelector('.read-ring-wrap');
     if (wrap) setRingProgress(wrap, 0, false);
   });
@@ -2209,7 +1658,7 @@ function resetSeriesProgress() {
 
 function markAllRead() {
   getPosts().filter(p => p.series === trackerActiveSeries).forEach(p => {
-    try { localStorage.setItem(getReadKey(p.title), '100'); } catch(e) {}
+    try { localStorage.setItem(getReadKey(p.slug), '100'); } catch(e) {}
     const wrap = p.el.querySelector('.read-ring-wrap');
     if (wrap) setRingProgress(wrap, 100, true);
   });
@@ -2981,6 +2430,8 @@ function initCotd() {
 // ── Boot ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initBanner();
+  initCotd();              // independent of posts — render immediately
+  loadPosts();             // render cards from inlined data (offline, no network)
   updateCounts();
   buildLatest();
   initObserver();
@@ -2989,7 +2440,6 @@ document.addEventListener('DOMContentLoaded', () => {
   buildTrackerTabs();
   refreshTrackerUI();
   updateTrackerBtn();
-  initCotd();
 });
 </script>
 
